@@ -1,0 +1,28 @@
+Multiple scenes / differents simulations, classe scene maybe ? auto implement it with init fonction inline <3
+Music effects
+Physic engine
+-Apply a vector on an object, then multiple ones
+=> direction, valeur, sens
+polaires, carthésiens :o)
+direction : angle / cathésien
+sens : N/A si sol définit
+valeur : valeur absolue en Newton, valeur cathésienne
+
+pas de négatif
+le vecteur change ou pas ? on applique tout les vecteurs d'un coup ou on les imbrique
+perte de force, mettre à jour les vecteurs en même temps que l'objet
+
+|forces de frottement| pression ? 
+
+1.Ajouter une liste de vecteurs a un objet
+=> Faire une classe de vecteurs
+3.Bouger en fonction des vecteurs
+4.Mettre a jour les vecteurs (frottements)
+
+radius en m ou cm 
+-calculate gravitation / interaction F = G * (m1*m2)/d^2
+-interaction electromagnétique
+gravité comme une constante : p=mg
+
+tout les objets sont ponctuels
+
