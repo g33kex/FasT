@@ -18,12 +18,12 @@ import physics.maths.Point;
 
 public class Render {
 
-	private String windowTitle;
-	private int width,height;
+	 private String windowTitle;
+	 private int width,height;
 	
 	
-	private JFrame frame = new JFrame();
-	Canvas panel = new Canvas();
+	 private JFrame frame = new JFrame();
+	 JPanel panel = new JPanel();
 	 private Canvas glCanvas = new Canvas();
 	 private final JPanel panelOptions = new JPanel();
 	
@@ -45,7 +45,7 @@ public class Render {
 	
 	private void initGL() throws LWJGLException
 	{
-	   Display.setParent(panel);
+	   Display.setParent(glCanvas);
 	   Display.create();
 	   //Display.setTitle(this.getWindowTitle());
 		//Display.setDisplayMode(new DisplayMode(this.getWidth(),this.getHeight()));
@@ -53,8 +53,7 @@ public class Render {
         Display.setVSyncEnabled(true);
         //Display.setResizable(true);
         this.resetGL();
-  //      glCanvas.requestFocus();
-        panel.requestFocus();
+        glCanvas.requestFocus();
 	}
 
 	public void initGUI()
@@ -81,15 +80,17 @@ public class Render {
 	    // panelText.add(textPane);
 	
 	    
-	//     panel.setLayout(new BorderLayout(0, 0));
+	     panel.setLayout(new BorderLayout(0, 0));
 	     panel.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
-	     panel.setBackground(Color.YELLOW);
+	     panel.setBackground(Color.DARK_GRAY);
 
 	     
-	     panel.setFocusable(true);
-	    panel.setIgnoreRepaint(true);
-	   //  panel.setRequestFocusEnabled(true);
-	    // panel.add(glCanvas);
+	     panel.setRequestFocusEnabled(true);
+	     glCanvas.setFocusable(true);
+	     glCanvas.setBackground(Color.DARK_GRAY);
+	     glCanvas.setIgnoreRepaint(true);
+
+	     panel.add(glCanvas);
 
 	     
 	     frame.getContentPane().add(panelOptions,BorderLayout.EAST);
@@ -98,7 +99,7 @@ public class Render {
 	     frame.pack();
 	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
 	     
-		frame.setVisible(true);
+	     frame.setVisible(true);
 
 	}
 	

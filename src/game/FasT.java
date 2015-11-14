@@ -56,6 +56,8 @@ public class FasT {
 	private double period = Math.pow(10, 8)/freq;
 	final private int updatesBeforeRender = 5;
 	final private double targetFPS = 60;
+	//Higher is this, less CPU the program will consume but slower it will get (default is 100)
+	final private int maxSleep = 20;
 	final private double targetRenderPeriod = Math.pow(10,8)/targetFPS;
 	private volatile int frameCount = 0;
 	private volatile int fps = 60;
@@ -144,7 +146,7 @@ public class FasT {
 			// float interpolation = Math.min(1.0f, (float) ((now - lastUpdateTime) / this.period) );
 	         //   double beforeRender = System.nanoTime();
              this.render();
-	           // lastRenderTime = now;
+	           lastRenderTime = now;
 			 	//log.info("TIME TO RENDER : "+((System.nanoTime()-beforeRender)/1000000)+"ms");
 	            //Update the frames we got.
 	            int thisSecond = (int) (lastUpdateTime / 1000000000);
@@ -157,7 +159,6 @@ public class FasT {
 	            //   log.info("X distance = "+(entityHandler.get(this.theBall).getPosition().getX()-this.ballInit.getX())+"|Y distance = "+(entityHandler.get(this.theBall).getPosition().getY()-this.ballInit.getY()));
 	               this.ballInit=entityHandler.get(this.theBall).getPosition();
 	            }
-	         
 	            //Yield until it has been at least the target time between renders. This saves the CPU from hogging.
 	            while ( now - lastRenderTime < this.targetRenderPeriod && now - lastUpdateTime < this.period)
 	            {
@@ -165,7 +166,7 @@ public class FasT {
 	               //This stops the app from consuming all your CPU. It makes this slightly less accurate, but is worth it.
 	               //You can remove this line and it will still work (better), your CPU just climbs on certain OSes.
 	               //FYI on some OS's this can cause pretty bad stuttering. Scroll down and have a look at different peoples' solutions to this.
-	               try {Thread.sleep(100);} catch(Exception e) {} 
+	               try {Thread.sleep(this.maxSleep);} catch(Exception e) {} 
 	               
 	               now = System.nanoTime();
 	            }
