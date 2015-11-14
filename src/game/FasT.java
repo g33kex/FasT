@@ -133,6 +133,7 @@ public class FasT {
 	               this.update(Math.pow(10, -9)*(now-lastUpdateTime));
 	               lastUpdateTime += this.period;
 	               updateCount++;
+
 	            }
 			 
 			 if ( now - lastUpdateTime > this.period)
@@ -141,9 +142,10 @@ public class FasT {
 	            }
 			 
 			// float interpolation = Math.min(1.0f, (float) ((now - lastUpdateTime) / this.period) );
-	            this.render();
-	            lastRenderTime = now;
-	         
+	         //   double beforeRender = System.nanoTime();
+             this.render();
+	           // lastRenderTime = now;
+			 	//log.info("TIME TO RENDER : "+((System.nanoTime()-beforeRender)/1000000)+"ms");
 	            //Update the frames we got.
 	            int thisSecond = (int) (lastUpdateTime / 1000000000);
 	            if (thisSecond > lastSecondTime)

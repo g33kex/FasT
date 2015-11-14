@@ -23,7 +23,7 @@ public class Render {
 	
 	
 	private JFrame frame = new JFrame();
-	JPanel panel = new JPanel();
+	Canvas panel = new Canvas();
 	 private Canvas glCanvas = new Canvas();
 	 private final JPanel panelOptions = new JPanel();
 	
@@ -45,7 +45,7 @@ public class Render {
 	
 	private void initGL() throws LWJGLException
 	{
-	   Display.setParent(glCanvas);
+	   Display.setParent(panel);
 	   Display.create();
 	   //Display.setTitle(this.getWindowTitle());
 		//Display.setDisplayMode(new DisplayMode(this.getWidth(),this.getHeight()));
@@ -53,7 +53,8 @@ public class Render {
         Display.setVSyncEnabled(true);
         //Display.setResizable(true);
         this.resetGL();
-        glCanvas.requestFocus();
+  //      glCanvas.requestFocus();
+        panel.requestFocus();
 	}
 
 	public void initGUI()
@@ -80,13 +81,15 @@ public class Render {
 	    // panelText.add(textPane);
 	
 	    
-	     panel.setLayout(new BorderLayout(0, 0));
+	//     panel.setLayout(new BorderLayout(0, 0));
 	     panel.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 	     panel.setBackground(Color.YELLOW);
 
+	     
 	     panel.setFocusable(true);
-	     panel.setRequestFocusEnabled(true);
-	     panel.add(glCanvas);
+	    panel.setIgnoreRepaint(true);
+	   //  panel.setRequestFocusEnabled(true);
+	    // panel.add(glCanvas);
 
 	     
 	     frame.getContentPane().add(panelOptions,BorderLayout.EAST);
@@ -208,7 +211,8 @@ public class Render {
 		GL11.glPushMatrix();
 
 		Display.update();
-		glCanvas.paint(glCanvas.getGraphics());
+		//glCanvas.paint(glCanvas.getGraphics());
+		//panel.paint(frame.getGraphics());
 
 
 	}
