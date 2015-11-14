@@ -23,9 +23,10 @@ public class Render {
 	
 	
 	 private JFrame frame = new JFrame();
-	 JPanel panel = new JPanel();
-	 private Canvas glCanvas = new Canvas();
+	 private final JPanel panel = new JPanel();
+	 private final Canvas glCanvas = new Canvas();
 	 private final JPanel panelOptions = new JPanel();
+	 private final JPanel panelHelp = new JPanel();
 	
 
 	public Render(){
@@ -54,6 +55,7 @@ public class Render {
         //Display.setResizable(true);
         this.resetGL();
         glCanvas.requestFocus();
+  
 	}
 
 	public void initGUI()
@@ -77,6 +79,12 @@ public class Render {
 	     panelOptions.setPreferredSize(new Dimension(200,this.getHeight()));
 	  
 	     panelOptions.setBackground(Color.BLUE);
+	     
+	     panelHelp.setLayout(new BorderLayout(0,0));
+	     
+	     panelHelp.setPreferredSize(new Dimension(200,this.getHeight()));
+	     
+	     panelHelp.setBackground(Color.RED);
 	    // panelText.add(textPane);
 	
 	    
@@ -84,7 +92,6 @@ public class Render {
 	     panel.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 	     panel.setBackground(Color.DARK_GRAY);
 
-	     
 	     panel.setRequestFocusEnabled(true);
 	     glCanvas.setFocusable(true);
 	     glCanvas.setBackground(Color.DARK_GRAY);
@@ -93,8 +100,10 @@ public class Render {
 	     panel.add(glCanvas);
 
 	     
+	     
 	     frame.getContentPane().add(panelOptions,BorderLayout.EAST);
 	     frame.getContentPane().add(panel,BorderLayout.CENTER);
+	     frame.getContentPane().add(panelHelp,BorderLayout.WEST);
 	     
 	     frame.pack();
 	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
