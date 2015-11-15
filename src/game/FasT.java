@@ -21,6 +21,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 
 import physics.Physics;
 import physics.maths.Angle;
@@ -65,8 +66,8 @@ public class FasT {
 	private volatile double lastUpdateTime=-1;
 	
 	//DISPLAY
-	private final int width = 1000;
-	private final int height = 650;
+	private final int width = 850;//1000;
+	private final int height = 550;//650;
 	private final String title = "FasT";
 	
 	private Point ballInit;
@@ -76,7 +77,7 @@ public class FasT {
 	
 	public FasT() throws LWJGLException {
 		this.on=true;
-		this.pause=false;
+		//this.pause=false;
 		this.theFasT = this;
 		//Vector v = new Vector(-1,0,true);
 		C c = new C(-1,1);
@@ -216,6 +217,20 @@ public class FasT {
 			{
 				//Coup spécial : les 10 camion qui te tombe sur la tête : 19620 Newtons dans ta geulle 
 				entityHandler.get(this.theBall).applyForce(new C(new Angle(Angle.convertToRad(90)),0.1));
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_P)
+			{
+				//log.info("Width : " + render.getFrame().getWidth() + " & Height = " + render.getFrame().getHeight());
+				try {
+					Display.setDisplayMode(new DisplayMode(Display.getParent().getWidth(),Display.getParent().getHeight()-1));
+				} catch (LWJGLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			//	Display.setLocation(Display.getParent().getX(), Display.getParent().getY());
+				//render.getFrame().setSize(new Dimension(render.getFrame().getWidth(), render.getFrame().getHeight()+1));
+		//		render.getFrame().pack();
 			}
 		}
 	}

@@ -1,16 +1,34 @@
 package render;
 
 import game.FasT;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.Document;
+import javax.swing.text.html.HTMLEditorKit;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
+
+
 
 import physics.maths.Point;
 
@@ -25,9 +43,15 @@ public class Render {
 	 private JFrame frame = new JFrame();
 	 private final JPanel panel = new JPanel();
 	 private final Canvas glCanvas = new Canvas();
+	 private final JPanel panelLeft = new JPanel();
 	 private final JPanel panelOptions = new JPanel();
 	 private final JPanel panelHelp = new JPanel();
 	
+	 public JFrame getFrame()
+	 {
+		 return this.frame;
+	 }
+	 
 
 	public Render(){
 		
@@ -55,6 +79,7 @@ public class Render {
         //Display.setResizable(true);
         this.resetGL();
         glCanvas.requestFocus();
+        frame.pack();
   
 	}
 
@@ -66,8 +91,10 @@ public class Render {
 
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		
-	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	    frame.setResizable(false);
+	   // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	    frame.setResizable(true);
+	    frame.setMaximumSize(new Dimension(1280,773));
+	    frame.setMinimumSize(new Dimension(765,465));
 	     
 	    
 	    frame.getContentPane().setLayout(new BorderLayout(0,0));
@@ -76,18 +103,63 @@ public class Render {
 	    
 	     panelOptions.setLayout(new BorderLayout(0,0));
 	  
-	     panelOptions.setPreferredSize(new Dimension(200,this.getHeight()));
+	     panelOptions.setPreferredSize(new Dimension(this.getWidth(),150));
 	  
 	     panelOptions.setBackground(Color.BLUE);
 	     
 	     panelHelp.setLayout(new BorderLayout(0,0));
 	     
-	     panelHelp.setPreferredSize(new Dimension(200,this.getHeight()));
+	     panelHelp.setPreferredSize(new Dimension(400,this.getHeight()));
 	     
 	     panelHelp.setBackground(Color.RED);
 	    // panelText.add(textPane);
-	
+	     JEditorPane editorPane = new JEditorPane("text/html", "The rain in <a href='http://foo.com/'>"
+					+"Spain</a> falls mainly on the <a href='http://bar.com/'>plain</a>.");
+	    // editorPane.setText("<img src=\"http://latex.codecogs.com/svg.latex?1+sin(x)\" border=\"0\">");
+	     editorPane.setEditable(false);
+	    /* editorPane.addHyperlinkListener(new HyperlinkListener() {
+	    	 public void hyperlinkUpdate(HyperlinkEvent hle) {
+	    	 if (HyperlinkEvent.EventType.ACTIVATED.equals(hle.getEventType())) {
+	    		 try {
+					editorPane.setPage(getClass().getClassLoader().getResource("ressources/Helloworld.html"));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	    	 }
+	    	 }
+	    	 });
+	     Path currentRelativePath = Paths.get("");
+	     String s = currentRelativePath.toAbsolutePath().toString();
+	     System.out.println("Current relative path is: " + s);
+	 	ClassLoader classLoader = getClass().getClassLoader();
+	 	URL baseURL = classLoader.getResource("ressources/CarnetDeBord.html");
+	 	
+	*/
+	     JScrollPane editorScrollPane = new JScrollPane(editorPane);
 	    
+
+	     HTMLEditorKit kit = new HTMLEditorKit();
+	        editorPane.setEditorKit(kit);
+	        // add some styles to the html
+	       
+	        // create a document, set it on the jeditorpane, then add the html
+	        Document doc = kit.createDefaultDocument();
+	        editorPane.setDocument(doc);
+	       try{
+	    	   editorPane.setPage(getClass().getClassLoader().getResource("ressources/test/test.html"));
+	       }catch(Exception e)
+	       {
+	    	   e.printStackTrace();
+	       }
+
+	     //panelHelp.add(editorScrollPane);
+	      // HelpBrowser hb = new HelpBrowser();
+	    //.add(hb);
+           HelpBrowser browser = new HelpBrowser();
+           browser.setHomePage("http://www.example.com/");
+           
+           panelHelp.add(browser);
+	     
 	     panel.setLayout(new BorderLayout(0, 0));
 	     panel.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 	     panel.setBackground(Color.DARK_GRAY);
@@ -99,18 +171,38 @@ public class Render {
 
 	     panel.add(glCanvas);
 
+	     panelLeft.setLayout(new BorderLayout(0,0));
+	     panelLeft.add(panel,BorderLayout.CENTER);
+	     panelLeft.add(panelOptions,BorderLayout.SOUTH);
 	     
-	     
-	     frame.getContentPane().add(panelOptions,BorderLayout.EAST);
-	     frame.getContentPane().add(panel,BorderLayout.CENTER);
-	     frame.getContentPane().add(panelHelp,BorderLayout.WEST);
+	     frame.getContentPane().add(panelHelp,BorderLayout.EAST);
+	     frame.getContentPane().add(panelLeft,BorderLayout.CENTER);
 	     
 	     frame.pack();
 	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
 	     
+	    this.createMenuBar();
+	     
 	     frame.setVisible(true);
 
 	}
+
+private void createMenuBar() {
+
+    JMenuBar menubar = new JMenuBar();
+  //  ImageIcon icon = new ImageIcon("exit.png");
+
+    JMenu file = new JMenu("File");
+    file.setMnemonic(KeyEvent.VK_F);
+
+    JMenuItem eMenuItem = new JMenuItem("Exit");
+    eMenuItem.setMnemonic(KeyEvent.VK_E);
+    eMenuItem.setToolTipText("Exit application");
+    file.add(eMenuItem);
+    menubar.add(file);
+
+    frame.setJMenuBar(menubar);
+}
 	
 	private void resetGL()
 	{
