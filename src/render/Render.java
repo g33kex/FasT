@@ -9,6 +9,10 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -100,12 +104,31 @@ public class Render {
 	    frame.getContentPane().setLayout(new BorderLayout(0,0));
 	    
 
+	    JToggleButton btnPause = new JToggleButton("Play");
+	    btnPause.addItemListener(new ItemListener(){
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED)
+				{
+					FasT.getFasT().setPaused(false);
+					btnPause.setText("Pause");
+				}
+				else if(e.getStateChange() == ItemEvent.DESELECTED)
+				{
+					FasT.getFasT().setPaused(true);
+					btnPause.setText("Play");
+				}
+				
+			}});
 	    
-	     panelOptions.setLayout(new BorderLayout(0,0));
+	     panelOptions.setLayout(new FlowLayout(FlowLayout.LEFT));
 	  
 	     panelOptions.setPreferredSize(new Dimension(this.getWidth(),150));
 	  
-	     panelOptions.setBackground(Color.BLUE);
+	     panelOptions.setBackground(new Color(90, 95, 105));
+	     
+	     panelOptions.add(btnPause);
 	     
 	     panelHelp.setLayout(new BorderLayout(0,0));
 	     
@@ -113,7 +136,7 @@ public class Render {
 	     
 	     panelHelp.setBackground(Color.RED);
 	    // panelText.add(textPane);
-	     JEditorPane editorPane = new JEditorPane("text/html", "The rain in <a href='http://foo.com/'>"
+	/*     JEditorPane editorPane = new JEditorPane("text/html", "The rain in <a href='http://foo.com/'>"
 					+"Spain</a> falls mainly on the <a href='http://bar.com/'>plain</a>.");
 	    // editorPane.setText("<img src=\"http://latex.codecogs.com/svg.latex?1+sin(x)\" border=\"0\">");
 	     editorPane.setEditable(false);
@@ -134,7 +157,7 @@ public class Render {
 	 	ClassLoader classLoader = getClass().getClassLoader();
 	 	URL baseURL = classLoader.getResource("ressources/CarnetDeBord.html");
 	 	
-	*/
+	
 	     JScrollPane editorScrollPane = new JScrollPane(editorPane);
 	    
 
@@ -150,7 +173,7 @@ public class Render {
 	       }catch(Exception e)
 	       {
 	    	   e.printStackTrace();
-	       }
+	       }*/
 
 	     //panelHelp.add(editorScrollPane);
 	      // HelpBrowser hb = new HelpBrowser();

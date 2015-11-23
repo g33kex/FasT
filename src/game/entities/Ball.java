@@ -4,8 +4,10 @@ import game.FasT;
 import physics.BBCircle;
 import physics.maths.Angle;
 import physics.maths.C;
+import physics.maths.Normal;
 import physics.maths.Point;
 import physics.maths.Vector;
+import physics.maths.Normal.Unit;
 import render.Render;
 
 public class Ball extends Entity {
@@ -41,7 +43,7 @@ class B extends A {
 		super(position,0.0312);
 		FasT.getFasT().getLogger().debug("MASSE=" + masseVolumique*4/3*Math.PI*Math.pow(10,3));
 		
-		this.radius=10;
+		this.radius=Normal.normal(20, Unit.cm);
 		this.boundingBox = new BBCircle(this.position, radius);
 		//this.velocity=new C(new Angle(Angle.convertToRad(45)),35);
 		//this.velocity=new C(new Angle(Angle.convertToRad(-90)),20).sum(new C(new Angle(Angle.convertToRad(0)),10));
@@ -52,8 +54,8 @@ class B extends A {
 	
 	public Ball(Point position,double radius)
 	{
-		super(position,-1);
-		this.radius=radius;
+		super(position,0.0312);
+		this.radius=Normal.normal(radius,Unit.cm);
 		this.boundingBox = new BBCircle(this.position, radius);
 	}
 
@@ -62,6 +64,7 @@ class B extends A {
 		float[] color = {(float) 0.8,(float) 0.1, (float) 0.3};
 		render.drawCircle(this.position,this.radius,color);	
 		render.drawLines(this.positions);
+		render.drawLine(this.getPosition(), new Point(this.getPosition().getX()+this.getVelocity().getRe(),this.getPosition().getY()+this.getVelocity().getIm()));
 	}
 	
 

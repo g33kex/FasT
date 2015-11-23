@@ -3,6 +3,11 @@ package game.entities;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import org.lwjgl.input.Mouse;
+
+import physics.BB;
+import physics.maths.Point;
+
 public class EntityHandler {
 
 	private volatile ArrayList<Entity> entities = new ArrayList<Entity>();
@@ -42,9 +47,21 @@ public class EntityHandler {
 		}
 		return null;
 	}
+	
+	public Entity getEntityUnderMouse() {
+		for(Entity b : this.getEntities())
+		{
+			if(BB.distanceBetweenTwoPoints(new Point(Mouse.getEventX(),Mouse.getEventY()),b.getPosition())<((Ball) b).getRadius())
+			{
+				return b;
+			}	
+		}
+		return null;
+	}
+	
 
 	public ArrayList<Entity> getEntities() {
 		return new ArrayList<Entity>(this.entities);
 	}
-	
+
 }

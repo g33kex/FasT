@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import physics.maths.Angle;
 import physics.maths.C;
+import physics.maths.Normal;
+import physics.maths.Normal.Unit;
 import physics.maths.Point;
 import game.FasT;
 import game.entities.Ball;
@@ -146,8 +148,8 @@ public class Physics {
 		
 				
 				//Equation horaire
-				double x = entity.getPosition().getX()+entity.getVelocity().getRe()*time;
-				double y = entity.getPosition().getY()+entity.getVelocity().getIm()*time;
+				double x = entity.getPosition().getX()+Normal.normal(entity.getVelocity().getRe()*time,Unit.m);
+				double y = entity.getPosition().getY()+Normal.normal(entity.getVelocity().getIm()*time,Unit.m);
 				
 				entity.setPosition(new Point(x,y));
 	}

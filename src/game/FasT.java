@@ -23,6 +23,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
+import physics.BB;
 import physics.Physics;
 import physics.maths.Angle;
 import physics.maths.C;
@@ -65,6 +66,8 @@ public class FasT {
 	
 	private volatile double lastUpdateTime=-1;
 	
+	public void setPaused(boolean b) {this.pause=b;}
+	
 	//DISPLAY
 	private final int width = 850;//1000;
 	private final int height = 550;//650;
@@ -78,7 +81,7 @@ public class FasT {
 	public FasT() throws LWJGLException {
 		this.on=true;
 		//this.pause=false;
-		this.theFasT = this;
+		FasT.theFasT = this;
 		//Vector v = new Vector(-1,0,true);
 		C c = new C(-1,1);
 		log.info("STARTING");
@@ -203,15 +206,15 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_1)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),10));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_2)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),20));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),70));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_3)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),150));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_L)
 			{
@@ -224,13 +227,17 @@ public class FasT {
 				try {
 					Display.setDisplayMode(new DisplayMode(Display.getParent().getWidth(),Display.getParent().getHeight()-1));
 				} catch (LWJGLException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 				
 			//	Display.setLocation(Display.getParent().getX(), Display.getParent().getY());
 				//render.getFrame().setSize(new Dimension(render.getFrame().getWidth(), render.getFrame().getHeight()+1));
 		//		render.getFrame().pack();
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_D)
+			{
+				this.entityHandler.destroy(this.entityHandler.getEntityUnderMouse());
 			}
 		}
 	}
@@ -239,13 +246,35 @@ public class FasT {
 	
 	private void handleMouse() 
 	{
+		
+		//TODO : Mouse
 		while(Mouse.next())
 		{
-			if(Mouse.getEventButtonState())
+			if(!Mouse.isButtonDown(0))
 			{
-				this.entityHandler.get(this.theBall).setPosition(new Point(Mouse.getEventX(),Mouse.getEventY()));
+				for(Entity entity : this.entityHandler.getEntities()) {
+					entity.setBeingDragged(false);
+				}
 			}
 			
+			
+			if(Mouse.getEventButtonState())
+			{	
+				Entity e;
+				if(( e = entityHandler.getEntityUnderMouse()) != null)
+				{
+					e.setBeingDragged(true);
+				}
+			}
+
+			for(Entity b : this.entityHandler.getEntities())
+			{
+				if(b.getbeingDraged())
+				{
+					b.drag(Mouse.getEventDX(),Mouse.getEventDY(),Mouse.getEventNanoseconds());
+					break;
+				}
+			}
 		}
 	}
 	
@@ -296,5 +325,6 @@ public class FasT {
 		Display.destroy();
 		System.exit(0);
 	}
+
 	
 }

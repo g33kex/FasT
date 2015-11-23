@@ -144,8 +144,10 @@ public class C {
 	
 	private Angle argument(C c1)
 	{
-		return new Angle(Math.atan(c1.getIm()/c1.getRe()));
+		//return new Angle(Math.atan(c1.getIm()/c1.getRe()));
+		return new Angle(Math.atan2(c1.getIm(), c1.getRe()));
 	}
+
 
 	private double getRe(Angle theta, double rho) {
 		return rho*Math.cos(theta.getRad());
