@@ -1,5 +1,11 @@
 package game.entities;
 
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import game.FasT;
 import physics.BBCircle;
 import physics.maths.Angle;
@@ -30,33 +36,115 @@ class B extends A {
 }
  
 	 */
-	private final double radius; // m
-	private final static double masseVolumique = 0.1; //7500 (acier) 20 (coton) 700 (acajou)
+	private double radius; // m
+	private double masseVolumique = 0.1; //7500 (acier) 20 (coton) 700 (acajou) kg/m^3
 	
 	public double getRadius()
 	{
 		return this.radius;
 	}
-	
-	public Ball(Point position)
+	private void setRadius(double radius)
 	{
-		super(position,0.0312);
-		FasT.getFasT().getLogger().debug("MASSE=" + masseVolumique*4/3*Math.PI*Math.pow(10,3));
+		this.radius=radius;
+		updateSizes();
+	}
+	
+	private void setMV(double mv)
+	{
+		this.masseVolumique=mv;
+		this.updateSizes();
+	}
+	
+	
+	//DO NOT OVERRIDE (Override getVolume each time)
+	@Override
+	public double getMass()
+	{
+		return masseVolumique*getVolume();
+	}
+	
+	public double getVolume()
+	{
+		return (4*Math.PI*Math.pow(Normal.normal(this.radius,Unit.m)/100,3))/3;
+	}
+	
+	public void updateSizes()
+	{
+		radiusLabel.setText("radius(cm)="+Normal.normal(getRadius(),Unit.m));
+		mvLabel.setText("m/V(kg/m^3)="+masseVolumique);
+		massLabel.setText("mass(kg)="+this.getMass());
+		volumeLabel.setText("volume(m^3)="+this.getVolume());
+	}
+	
+	private JSlider slidermv = new JSlider();
+	
+	JLabel radiusLabel = new JLabel();
+	JLabel mvLabel = new JLabel();
+	JLabel massLabel = new JLabel();
+	JLabel volumeLabel = new JLabel();
+	
+	JLabel bouncingLabel = new JLabel("bouncing");
+
+	
+	private void addToPopupMenu()
+	{
+		JSlider sliderRadius = new JSlider();
+		sliderRadius.setMinimum(10);
+		sliderRadius.setMaximum(300);
+		sliderRadius.setValue((int) this.radius);
+		sliderRadius.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent e) {
+				setRadius(Normal.normal(sliderRadius.getValue(), Unit.cm));
+			}
+		});
+
+		slidermv.setMinimum(1);
+		slidermv.setMaximum(1000);
+		slidermv.setValue((int)this.masseVolumique);
+		slidermv.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent e) {
+				setMV(slidermv.getValue());
+			}	
+		});
+	
+				
 		
-		this.radius=Normal.normal(20, Unit.cm);
+		tweak.add(radiusLabel);
+		tweak.add(sliderRadius);
+		tweak.add(mvLabel);
+		tweak.add(slidermv);
+		tweak.add(bouncingLabel);
+		
+		tweak.add(massLabel);
+		tweak.add(volumeLabel);
+
+		this.updateSizes();
+		
+		popupMenu.updateUI();
+	}
+	
+	public Ball(Point position, EntityHandler entityHandler)
+	{
+		super(position,0.0312,entityHandler);
+		//FasT.getFasT().getLogger().debug("MASSE=" + masseVolumique*4/3*Math.PI*Math.pow(10,3));
+		
+		this.setRadius(Normal.normal(20, Unit.cm));
 		this.boundingBox = new BBCircle(this.position, radius);
 		//this.velocity=new C(new Angle(Angle.convertToRad(45)),35);
 		//this.velocity=new C(new Angle(Angle.convertToRad(-90)),20).sum(new C(new Angle(Angle.convertToRad(0)),10));
 		//this.velocity=new C(new Angle(Angle.convertToRad(90)),20).sum(new C(new Angle(Angle.convertToRad(0)),30));
 		//this.applyForce(new C(new Angle(Angle.convertToRad(35)),100000000));
 		this.positions.add(this.position);
+		
+		this.addToPopupMenu();
 	}
 	
-	public Ball(Point position,double radius)
+	public Ball(Point position,double radius,EntityHandler entityHandler)
 	{
-		super(position,0.0312);
+		super(position,0.0312,entityHandler);
 		this.radius=Normal.normal(radius,Unit.cm);
 		this.boundingBox = new BBCircle(this.position, radius);
+		this.addToPopupMenu();
 	}
 
 	@Override

@@ -1,7 +1,14 @@
 package game.entities;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.UUID;
+
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import game.FasT;
 import physics.BB;
@@ -36,11 +43,44 @@ public abstract class Entity
 	
 	private boolean isBeingDragged = false;
 	
-	public Entity(Point position, double mass) {
+	protected final JPopupMenu popupMenu = new JPopupMenu();
+	
+	public JPopupMenu getPopupMenu() { return this.popupMenu;}
+	protected JMenu tweak = new JMenu("tweak");
+	
+	private JLabel speedLabel = new JLabel();
+	
+	protected final void createPopupMenu()
+	{
+		JMenuItem delete = new JMenuItem("delete");
+		delete.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				entityHandler.destroy(entity);
+			}
+		});
+		
+
+		this.popupMenu.add(tweak);
+		
+		this.popupMenu.add(speedLabel);
+		
+		this.popupMenu.add(delete);
+		
+	}
+	
+	protected final EntityHandler entityHandler;
+	protected final Entity entity = this;
+	
+	public Entity(Point position, double mass,EntityHandler entityHandler) {
 		this.uuid = UUID.randomUUID();
 		this.position=position;
 		this.mass=mass;
-		this.velocity=new C(0,0);
+		this.setVelocity(new C(0,0));
+		
+		this.entityHandler=entityHandler;
+		
+		this.createPopupMenu();
 	}
 	
 	public void setPosition(Point p)
@@ -96,6 +136,7 @@ public abstract class Entity
 
 	public void setVelocity(C velocity) {
 		this.velocity = velocity;
+		this.speedLabel.setText("speed(m/s)="+this.getVelocity().getMod());
 	}
 	
 	public void applyForce(C c)
@@ -120,6 +161,7 @@ public abstract class Entity
 			if(physics.update(this, deltat,entities))
 			{
 				this.positions.add(this.position);
+
 				//lastUpdateTime=System.nanoTime()/Math.pow(10, 9);
 			}
 		}

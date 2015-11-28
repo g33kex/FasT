@@ -12,8 +12,8 @@ public class Wall extends Entity {
 	private double longueur;
 	private Point posMax;
 	
-	public Wall(Point position,double longueur,Angle angle) {
-		super(position, -1);
+	public Wall(Point position,double longueur,Angle angle,EntityHandler entityHandler) {
+		super(position, -1,entityHandler);
 		this.angle=angle;
 		this.longueur = longueur;
 		C c = new C(angle,longueur);

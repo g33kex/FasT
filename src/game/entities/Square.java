@@ -5,9 +5,9 @@ import render.Render;
 
 public class Square extends Entity {
 
-	public Square(Point position,double width,double lenght,double mass)
+	public Square(Point position,double width,double lenght,double mass,EntityHandler entityHandler)
 	{
-		super(position,mass);
+		super(position,mass,entityHandler);
 	}
 	
 	@Override

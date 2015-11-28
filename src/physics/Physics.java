@@ -18,6 +18,10 @@ public class Physics {
 	
 	public boolean GROUND = false;
 	
+	
+	public int simulationLevel = 1; // 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
+	
+	
 	public Physics()
 	{
 	//	g=6; FALLING ON THE MOON

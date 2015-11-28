@@ -46,6 +46,16 @@ public class FasT {
 		return this.log;
 	}
 	
+	public EntityHandler getEntityHandler()
+	{
+		return this.entityHandler;
+	}
+	
+	public Physics getPhysicsHandler()
+	{
+		return this.physics;
+	}
+	
 	public static FasT getFasT()
 	{
 		return theFasT;
@@ -66,11 +76,13 @@ public class FasT {
 	
 	private volatile double lastUpdateTime=-1;
 	
-	public void setPaused(boolean b) {this.pause=b;}
+	public void setPaused(boolean b) {this.pause=b;this.render.play.setText(b ? "play" : "pause");}
+	public boolean isPaused() {return this.pause;}
+
 	
 	//DISPLAY
-	private final int width = 850;//1000;
-	private final int height = 550;//650;
+	private final int width = 870;//850;//1000;
+	private final int height = 660;//550;//650;
 	private final String title = "FasT";
 	
 	private Point ballInit;
@@ -95,7 +107,7 @@ public class FasT {
 	{
 		render.init(this.width,this.height,this.title);
 
-		this.theBall = entityHandler.spawn(new Ball(new Point(10,500)));
+		this.theBall = entityHandler.spawn(new Ball(new Point(10,500),this.getEntityHandler()));
 		//entityHandler.spawn(new Ball(new Point(40,500)));
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
@@ -175,6 +187,7 @@ public class FasT {
 	               now = System.nanoTime();
 	            }
 		}
+		exit();
 
 	}
 	
@@ -193,7 +206,7 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_SPACE)
 			{
-				this.pause=!this.pause;
+				this.setPaused(!this.isPaused());
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_G)
 			{
@@ -201,20 +214,20 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_T)
 			{
-				entityHandler.spawn(new Ball(new Point(10,500)));
+				entityHandler.spawn(new Ball(new Point(10,500),this.getEntityHandler()));
 				this.period = Math.pow(10, 8)/0.1;
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_1)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_2)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),70));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),70,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_3)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),150));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),150,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_L)
 			{
@@ -237,7 +250,7 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_D)
 			{
-				this.entityHandler.destroy(this.entityHandler.getEntityUnderMouse());
+				this.entityHandler.destroy(this.entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY())));
 			}
 		}
 	}
@@ -258,10 +271,10 @@ public class FasT {
 			}
 			
 			
-			if(Mouse.getEventButtonState())
+			if(Mouse.getEventButtonState() && Mouse.getEventButton()==0)
 			{	
 				Entity e;
-				if(( e = entityHandler.getEntityUnderMouse()) != null)
+				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()))) != null)
 				{
 					e.setBeingDragged(true);
 				}
@@ -275,6 +288,20 @@ public class FasT {
 					break;
 				}
 			}
+			
+			
+			/*if(Mouse.getEventButton()==1 && Mouse.getEventButtonState())
+			{
+				/* Entity entity;
+	        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),e.getY())))!=null)
+	        	 {
+	        		 FasT.getFasT().getLogger().warning("THING UNDER MOUSE DETECTED");
+	        	 }
+	        	 else
+	        	 {
+	        		   this.render.popupMenu.show(Display.getParent(),Mouse.getEventX(), this.height-Mouse.getEventY()-10);
+	        	 }
+			}*/
 		}
 	}
 	
@@ -284,7 +311,7 @@ public class FasT {
 		this.handleKeyboard();
 		this.handleMouse();
 		
-		if(!this.pause)
+		if(!this.isPaused())
 		{
 		double currentTime = System.nanoTime();
 		double deltatime = currentTime-this.lastUpdateTime;
@@ -324,6 +351,10 @@ public class FasT {
 		log.warning("Exiting !");
 		Display.destroy();
 		System.exit(0);
+	}
+
+	public void quit() {
+		this.on=false;		
 	}
 
 	
