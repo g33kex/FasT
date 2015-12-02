@@ -8,6 +8,7 @@ import physics.maths.Normal;
 import physics.maths.Normal.Unit;
 import physics.maths.Point;
 import game.FasT;
+import game.Liquid;
 import game.entities.Ball;
 import game.entities.Entity;
 
@@ -20,6 +21,8 @@ public class Physics {
 	
 	
 	public int simulationLevel = 1; // 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
+	public Liquid liquid; // Liquid in the experiment zone
+	
 	
 	
 	public Physics()
@@ -152,8 +155,8 @@ public class Physics {
 		
 				
 				//Equation horaire
-				double x = entity.getPosition().getX()+Normal.normal(entity.getVelocity().getRe()*time,Unit.m);
-				double y = entity.getPosition().getY()+Normal.normal(entity.getVelocity().getIm()*time,Unit.m);
+				double x = entity.getPosition().getX()+entity.getVelocity().getRe()*time;
+				double y = entity.getPosition().getY()+entity.getVelocity().getIm()*time;
 				
 				entity.setPosition(new Point(x,y));
 	}
@@ -162,7 +165,7 @@ public class Physics {
 	{
 		ArrayList<C> forces = new ArrayList<C>();
 		forces.add(weight(entity.getMass())); // P=mg 
-		//forces.add(archimede(1000,4/3*Math.PI*Math.pow(((Ball)entity).getRadius(),3),g));
+		forces.add(archimede(this.liquid.getMasseVolumique(),((Ball) entity).getVolume(),g));
 		//forces.add(drag(entity.getVelocity(),10000000));
 		//FasT.getFasT().getLogger().debug(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
 		//forces.add(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));

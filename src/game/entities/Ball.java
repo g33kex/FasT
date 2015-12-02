@@ -65,12 +65,12 @@ class B extends A {
 	
 	public double getVolume()
 	{
-		return (4*Math.PI*Math.pow(Normal.normal(this.radius,Unit.m)/100,3))/3;
+		return (4*Math.PI*Math.pow(this.radius,3))/3;
 	}
 	
 	public void updateSizes()
 	{
-		radiusLabel.setText("radius(cm)="+Normal.normal(getRadius(),Unit.m));
+		radiusLabel.setText("radius(m)="+getRadius());
 		mvLabel.setText("m/V(kg/m^3)="+masseVolumique);
 		massLabel.setText("mass(kg)="+this.getMass());
 		volumeLabel.setText("volume(m^3)="+this.getVolume());
@@ -89,12 +89,12 @@ class B extends A {
 	private void addToPopupMenu()
 	{
 		JSlider sliderRadius = new JSlider();
-		sliderRadius.setMinimum(10);
-		sliderRadius.setMaximum(300);
+		sliderRadius.setMinimum(1);
+		sliderRadius.setMaximum(30);
 		sliderRadius.setValue((int) this.radius);
 		sliderRadius.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e) {
-				setRadius(Normal.normal(sliderRadius.getValue(), Unit.cm));
+				setRadius(sliderRadius.getValue()/10);
 			}
 		});
 
@@ -128,7 +128,7 @@ class B extends A {
 		super(position,0.0312,entityHandler);
 		//FasT.getFasT().getLogger().debug("MASSE=" + masseVolumique*4/3*Math.PI*Math.pow(10,3));
 		
-		this.setRadius(Normal.normal(20, Unit.cm));
+		this.setRadius(0.1);
 		this.boundingBox = new BBCircle(this.position, radius);
 		//this.velocity=new C(new Angle(Angle.convertToRad(45)),35);
 		//this.velocity=new C(new Angle(Angle.convertToRad(-90)),20).sum(new C(new Angle(Angle.convertToRad(0)),10));
@@ -142,7 +142,7 @@ class B extends A {
 	public Ball(Point position,double radius,EntityHandler entityHandler)
 	{
 		super(position,0.0312,entityHandler);
-		this.radius=Normal.normal(radius,Unit.cm);
+		this.radius=radius;
 		this.boundingBox = new BBCircle(this.position, radius);
 		this.addToPopupMenu();
 	}
@@ -152,8 +152,7 @@ class B extends A {
 		float[] color = {(float) 0.8,(float) 0.1, (float) 0.3};
 		render.drawCircle(this.position,this.radius,color);	
 		render.drawLines(this.positions);
-		render.drawLine(this.getPosition(), new Point(this.getPosition().getX()+this.getVelocity().getRe(),this.getPosition().getY()+this.getVelocity().getIm()));
+		//render.drawLine(this.getPosition(), new Point(this.getPosition().getX()+this.getVelocity().getRe(),this.getPosition().getY()+this.getVelocity().getIm()));
 	}
-	
 
 }

@@ -19,4 +19,17 @@ public class Point {
 		this.y = y;
 	}
 	
+	public Point toPlan()
+	{
+		return new Point(Normal.toPlan(this.getX()),Normal.toPlan(this.getY()));
+	}
+
+	public Point toReal() {
+		return new Point(Normal.toReal(this.getX()),Normal.toReal(this.getY()));
+	}
+
+	public Point add(Point p) {
+		return new Point(this.x+p.x,this.y+p.y);
+	}
+	
 }

@@ -99,20 +99,20 @@ public abstract class Entity
 	}
 	
 	private double lastUpdateTime=0;
-	public void drag(int X, int Y,long currentNanoTime) {
+	public void drag(Point p,long currentNanoTime) {
 		double constante = 3*2;
 		double time = currentNanoTime/Math.pow(10, 9);
 		double deltat = time-lastUpdateTime;
 		//FasT.getFasT().getLogger().debug(deltat);
 		
-		C c = new C(X,Y);
-		C c1 = new C(c.getTheta(),Normal.normal(c.getRho()/deltat/constante,Unit.cm));
+		C c = new C(p.getX(),p.getY());
+		C c1 = new C(c.getTheta(),c.getRho()/deltat);
 		
 		//FasT.getFasT().getLogger().debug(deltat);
 		
 		
 		this.setVelocity(c1);
-		this.setPosition(new Point(this.getPosition().getX()+X,this.getPosition().getY()+Y));
+		this.setPosition(this.getPosition().add(p));
 		//USE RHO BETWEEN LAST POINT AND THISONE TO CALCULATE SPEED THEN PROCESS THE ANGLE WITH THE VECTOR 
 		this.positions.clear();
 		lastUpdateTime=time;

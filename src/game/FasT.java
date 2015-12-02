@@ -27,6 +27,7 @@ import physics.BB;
 import physics.Physics;
 import physics.maths.Angle;
 import physics.maths.C;
+import physics.maths.Normal;
 import physics.maths.Point;
 import physics.maths.Vector;
 import render.Render;
@@ -107,10 +108,12 @@ public class FasT {
 	{
 		render.init(this.width,this.height,this.title);
 
-		this.theBall = entityHandler.spawn(new Ball(new Point(10,500),this.getEntityHandler()));
+		this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
 		//entityHandler.spawn(new Ball(new Point(40,500)));
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
+		
+		this.physics.liquid=Liquid.air();
 	}
 	
 	
@@ -214,20 +217,20 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_T)
 			{
-				entityHandler.spawn(new Ball(new Point(10,500),this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(10,500).toPlan(),this.getEntityHandler()));
 				this.period = Math.pow(10, 8)/0.1;
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_1)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),0.3,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_2)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),70,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),0.70,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_3)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),150,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),1.5,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_L)
 			{
@@ -274,7 +277,7 @@ public class FasT {
 			if(Mouse.getEventButtonState() && Mouse.getEventButton()==0)
 			{	
 				Entity e;
-				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()))) != null)
+				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()).toReal())) != null)
 				{
 					e.setBeingDragged(true);
 				}
@@ -284,7 +287,7 @@ public class FasT {
 			{
 				if(b.getbeingDraged())
 				{
-					b.drag(Mouse.getEventDX(),Mouse.getEventDY(),Mouse.getEventNanoseconds());
+					b.drag(new Point(Mouse.getEventDX(),Mouse.getEventDY()).toReal(),Mouse.getEventNanoseconds());
 					break;
 				}
 			}
@@ -306,6 +309,7 @@ public class FasT {
 	}
 	
 	
+	//Main method : Update the positions of the entities and handle the mouse / keyboard
 	private void update(double deltat) 
 	{
 		this.handleKeyboard();
@@ -326,8 +330,12 @@ public class FasT {
 		}
 		}
 		this.lastUpdateTime=System.nanoTime();
+		
+		//TODO : Resize Display when resize glcanvas
 	}
 	
+	
+	//Render entities and everything
 	public void render()
 	{
 		render.StartRender();
@@ -338,6 +346,8 @@ public class FasT {
 		{
 			e.render(render);
 		}
+		
+		physics.liquid.render(render);
 		
 		render.EndRender();
 		

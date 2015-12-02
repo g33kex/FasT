@@ -1,6 +1,7 @@
 package render;
 
 import game.FasT;
+import game.Liquid;
 import game.entities.Ball;
 import game.entities.Entity;
 import javafx.embed.swing.JFXPanel;
@@ -29,6 +30,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.basic.BasicComboBoxUI.ItemHandler;
@@ -98,6 +101,8 @@ public class Render {
         this.resetGL();
         glCanvas.requestFocus();
         frame.pack();
+        
+		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
   
 	}
 
@@ -145,7 +150,7 @@ public class Render {
 	     	glCanvas.setFocusable(true);
 	     	glCanvas.setBackground(Color.DARK_GRAY);
 	     	glCanvas.setIgnoreRepaint(true);
-
+	     	
 	     panel.add(glCanvas);
 
 	     //Panelleft is actually useless
@@ -245,10 +250,20 @@ private void renderMenu()
     
     JMenu liquid = new JMenu("liquid");
     
-    JLabel viscosityLabel = new JLabel("viscosity");
+    JLabel masseVolumiqueLabel = new JLabel("masse volumique");
+    JSlider masseVolumiqueSlider = new JSlider();
+    masseVolumiqueSlider.setMinimum(500);
+    masseVolumiqueSlider.setMaximum(1500);
+    masseVolumiqueSlider.addChangeListener(new ChangeListener()
+    		{
+				@Override
+				public void stateChanged(ChangeEvent e) {
+					FasT.getFasT().getPhysicsHandler().liquid = new Liquid(masseVolumiqueSlider.getValue(),FasT.getFasT().getPhysicsHandler().liquid);
+				}
+    		});
     
-    liquid.add(viscosityLabel);
-    
+    liquid.add(masseVolumiqueLabel);
+    liquid.add(masseVolumiqueSlider);
     
     game.add(liquid);
     
@@ -258,7 +273,7 @@ private void renderMenu()
     ball.addActionListener(new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			FasT.getFasT().getEntityHandler().spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()),30,FasT.getFasT().getEntityHandler()));
+			FasT.getFasT().getEntityHandler().spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),FasT.getFasT().getEntityHandler()));
 		}
     });
     
@@ -287,7 +302,7 @@ private void renderMenu()
 		         if ( e.isPopupTrigger() )
 		         {
 		        	 Entity entity;
-		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY())))!=null)
+		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).toReal()))!=null)
 		        	 {
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
 		        	 }
@@ -352,10 +367,12 @@ private void renderMenu()
 		 
 		 GL11.glPopMatrix();
 		 
-		 GL11.glBegin(GL11.GL_LINE_STRIP);
-		 GL11.glVertex2d(20, 20);
-		 GL11.glVertex2d((int) (20+Normal.normal(100, Unit.cm)), 20);
-		 GL11.glEnd();
+		 GL11.glColor3d(0.4, 0.9, 0.1);
+		// this.drawLine(new Point(20,20), new Point(20+100,20));
+		 //FasT.getFasT().getLogger().debug("1 meter = " + Normal.normal(100, Unit.cm));
+		// this.drawLine(new Point(20,40), new Point(20+Normal.toPlan(1),40));
+		 
+		 this.drawLine(new Point(1,1), new Point(2,1));
 		 
 		 //Draw text to show this is 1 meter
 	}
@@ -364,7 +381,6 @@ private void renderMenu()
 	
 	public void drawSquare(Point min, Point max)
 	{
-		 GL11.glColor3d(0,0,0);
 		GL11.glBegin(GL11.GL_POLYGON);
 		GL11.glVertex2d(min.getX(), min.getY());
 		GL11.glVertex2d(min.getX(), max.getY());
@@ -379,7 +395,7 @@ private void renderMenu()
 	}
 	
 	public void drawLines(ArrayList<Point> positions) {
-		GL11.glColor3d(0,245,51);
+		//GL11.glColor3d(0,245,51);
 		GL11.glBegin(GL11.GL_LINE_STRIP);
 		for(Point position : positions)
 		{
