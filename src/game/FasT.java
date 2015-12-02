@@ -52,9 +52,13 @@ public class FasT {
 		return this.entityHandler;
 	}
 	
-	public Physics getPhysicsHandler()
-	{
+	public Physics getPhysicsHandler()	{
 		return this.physics;
+	}
+
+	public Render getRender()
+	{
+		return this.render;
 	}
 	
 	public static FasT getFasT()
@@ -255,6 +259,14 @@ public class FasT {
 			{
 				this.entityHandler.destroy(this.entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY())));
 			}
+			if(Keyboard.getEventKey() == 13)
+			{
+				Normal.unzoom();
+			}
+			if(Keyboard.getEventKey() == 53)
+			{
+				Normal.zoom();
+			}
 		}
 	}
 	
@@ -266,6 +278,16 @@ public class FasT {
 		//TODO : Mouse
 		while(Mouse.next())
 		{
+			if(Mouse.getEventDWheel()>1)
+			{
+				Normal.unzoom();
+			}
+			else if(Mouse.getEventDWheel()<-1)
+			{
+				Normal.zoom();
+			}
+			
+			
 			if(!Mouse.isButtonDown(0))
 			{
 				for(Entity entity : this.entityHandler.getEntities()) {

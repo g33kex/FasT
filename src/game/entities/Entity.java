@@ -10,6 +10,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import game.Color;
 import game.FasT;
 import physics.BB;
 import physics.BBCircle;
@@ -27,6 +28,7 @@ public abstract class Entity
 	
 	protected Point position;
 	protected C velocity;
+	protected Color color = Color.RED;
 
 	protected ArrayList<Vector> F;
 	

@@ -101,8 +101,6 @@ public class Render {
         this.resetGL();
         glCanvas.requestFocus();
         frame.pack();
-        
-		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
   
 	}
 
@@ -318,7 +316,7 @@ private void renderMenu()
 }
        
 
-	private void resetGL()
+	public void resetGL()
 	{
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
@@ -328,7 +326,9 @@ private void renderMenu()
         GL11.glViewport(0, 0, Display.getWidth(), Display.getHeight());
         
         GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );	
+		GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
+		
+
 	}
 
 	public String getWindowTitle() {
@@ -364,15 +364,20 @@ private void renderMenu()
 		 
 		 GL11.glColor3d(0.0F, 0.0F, 0.0F);
 		 
-		 
-		 GL11.glPopMatrix();
+
+		 GL11.glPushMatrix();
+		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
+		
 		 
 		 GL11.glColor3d(0.4, 0.9, 0.1);
+		 
+		 //TODO : Make color class with getGreenFloat and getGreenRGB and chromatic wheel
 		// this.drawLine(new Point(20,20), new Point(20+100,20));
 		 //FasT.getFasT().getLogger().debug("1 meter = " + Normal.normal(100, Unit.cm));
 		// this.drawLine(new Point(20,40), new Point(20+Normal.toPlan(1),40));
 		 
-		 this.drawLine(new Point(1,1), new Point(2,1));
+		 this.drawLine(new Point(1,1).toReal(), new Point(1,1).toReal().add(new Point(1,0)));
+		 this.drawLine(new Point(1,10), new Point(20,10));
 		 
 		 //Draw text to show this is 1 meter
 	}
@@ -517,7 +522,7 @@ private void renderMenu()
      
 
 	public void EndRender() {
-		GL11.glPushMatrix();
+		GL11.glPopMatrix();
 
 		Display.update();
 	}
