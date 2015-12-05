@@ -1,6 +1,7 @@
 package game;
 
 import game.entities.Ball;
+import game.entities.Box;
 import game.entities.Entity;
 import game.entities.EntityHandler;
 import game.entities.Wall;
@@ -22,6 +23,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 
 import physics.BB;
 import physics.Physics;
@@ -94,6 +96,7 @@ public class FasT {
 	
 	
 	private UUID theBall;
+	private UUID theBox = UUID.randomUUID();
 	
 	public FasT() throws LWJGLException {
 		this.on=true;
@@ -110,16 +113,30 @@ public class FasT {
 	
 	private void init() throws LWJGLException
 	{
+		
+		this.physics.liquid=Liquid.air();
 		render.init(this.width,this.height,this.title);
 
 		this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
 		//entityHandler.spawn(new Ball(new Point(40,500)));
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
-		
-		this.physics.liquid=Liquid.air();
+		this.spawnWalls();
+	
+		render.updateLabels();
 	}
 	
+	private void spawnWalls()
+	{
+		entityHandler.destroy(this.theBox);
+	//	this.theBox=entityHandler.spawn(new Box(new Point(-this.width/2,-this.height/2).toReal(), new Point(this.width/2,this.height/2).toReal(),4,this.entityHandler));
+		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,this.entityHandler));
+		/*entityHandler.clear("wall");
+		entityHandler.spawn(new Wall(new Point(0,0).toReal(),Normal.toReal(this.width),new Angle(0),this.entityHandler));
+		entityHandler.spawn(new Wall(new Point(1,0).toReal(),Normal.toReal(this.height),new Angle(Math.PI/2),this.entityHandler));
+		entityHandler.spawn(new Wall(new Point(this.width,this.height-1).toReal(),Normal.toReal(this.width),new Angle(Math.PI),this.entityHandler));
+		entityHandler.spawn(new Wall(new Point(this.width,this.height).toReal(),Normal.toReal(this.height),new Angle(Math.PI*3/2),this.entityHandler));*/
+	}
 	
 	public void run()
 	{
@@ -186,6 +203,7 @@ public class FasT {
 	            while ( now - lastRenderTime < this.targetRenderPeriod && now - lastUpdateTime < this.period)
 	            {
 	               Thread.yield();
+	               //-XX:PerfDataSamplingInterval=500
 	               //This stops the app from consuming all your CPU. It makes this slightly less accurate, but is worth it.
 	               //You can remove this line and it will still work (better), your CPU just climbs on certain OSes.
 	               //FYI on some OS's this can cause pretty bad stuttering. Scroll down and have a look at different peoples' solutions to this.
@@ -226,15 +244,15 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_1)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),0.3,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX()-Normal.x,Mouse.getY()-Normal.y).toReal(),0.3,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_2)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),0.70,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX()-Normal.x,Mouse.getY()-Normal.y).toReal(),0.70,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_3)
 			{
-				entityHandler.spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),1.5,this.getEntityHandler()));
+				entityHandler.spawn(new Ball(new Point(Mouse.getX()-Normal.x,Mouse.getY()-Normal.y).toReal(),1.5,this.getEntityHandler()));
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_L)
 			{
@@ -261,30 +279,59 @@ public class FasT {
 			}
 			if(Keyboard.getEventKey() == 13)
 			{
-				Normal.unzoom();
+				Normal.unzoom(24);
+				this.spawnWalls();
 			}
 			if(Keyboard.getEventKey() == 53)
 			{
-				Normal.zoom();
+				Normal.zoom(24);
+				this.spawnWalls();
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_Z)
+			{
+		        GL11.glOrtho(0, 5,0,5, -1.0, 1.0);
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_Y)
+			{
+				  GL11.glOrtho(5, 0,5,0, -1.0, 1.0);
 			}
 		}
 	}
 	
 	//Force du rebond + réaction du support
-	
+	private boolean pos=true;
 	private void handleMouse() 
 	{
 		
 		//TODO : Mouse
 		while(Mouse.next())
 		{
-			if(Mouse.getEventDWheel()>1)
+			//log.warning("Wheel speed="+Mouse.getEventDWheel());
+			if(pos==true)
 			{
-				Normal.unzoom();
+				if(Mouse.getEventDWheel()>1)
+				{
+					Normal.unzoom(1);
+					this.spawnWalls();
+					pos=true;
+				}
+				else
+				{
+					pos=false;
+				}
 			}
-			else if(Mouse.getEventDWheel()<-1)
+			else
 			{
-				Normal.zoom();
+				if(Mouse.getEventDWheel()<-1)
+				{
+					Normal.zoom(1);
+					this.spawnWalls();
+					pos=false;
+				}
+				else
+				{
+					pos=true;
+				}
 			}
 			
 			
@@ -299,19 +346,32 @@ public class FasT {
 			if(Mouse.getEventButtonState() && Mouse.getEventButton()==0)
 			{	
 				Entity e;
-				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()).toReal())) != null)
+				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal())) != null)
 				{
 					e.setBeingDragged(true);
 				}
 			}
-
+			boolean r = false;
 			for(Entity b : this.entityHandler.getEntities())
 			{
 				if(b.getbeingDraged())
 				{
 					b.drag(new Point(Mouse.getEventDX(),Mouse.getEventDY()).toReal(),Mouse.getEventNanoseconds());
+					r=true;
 					break;
 				}
+			}
+			
+			if(r)
+				continue;
+			
+			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
+			{
+				Normal.x+=Mouse.getEventDX();
+				Normal.rx=Normal.toReal(Normal.x);
+				Normal.y+=Mouse.getEventDY();
+				Normal.ry=Normal.toReal(Normal.y);
+				this.spawnWalls();
 			}
 			
 			

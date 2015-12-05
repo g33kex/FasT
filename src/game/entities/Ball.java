@@ -10,6 +10,7 @@ import game.FasT;
 import physics.BBCircle;
 import physics.maths.Angle;
 import physics.maths.C;
+import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Point;
 import physics.maths.Vector;
@@ -37,7 +38,7 @@ class B extends A {
  
 	 */
 	private double radius; // m
-	private double masseVolumique = 0.1; //7500 (acier) 20 (coton) 700 (acajou) kg/m^3
+	private double masseVolumique = 3000; //7500 (acier) 20 (coton) 700 (acajou) kg/m^3
 	
 	public double getRadius()
 	{
@@ -70,10 +71,10 @@ class B extends A {
 	
 	public void updateSizes()
 	{
-		radiusLabel.setText("radius(m)="+getRadius());
-		mvLabel.setText("m/V(kg/m^3)="+masseVolumique);
-		massLabel.setText("mass(kg)="+this.getMass());
-		volumeLabel.setText("volume(m^3)="+this.getVolume());
+		radiusLabel.setText("radius(m)="+Maths.dfloor(getRadius()));
+		mvLabel.setText("m/V(kg/m^3)="+Maths.dfloor(masseVolumique));
+		massLabel.setText("mass(kg)="+Maths.dfloor(this.getMass()));
+		volumeLabel.setText("volume(m^3)="+Maths.dfloor(this.getVolume()));
 	}
 	
 	private JSlider slidermv = new JSlider();

@@ -51,6 +51,11 @@ public class Physics {
 			//entity.velocity=0;
 			//g=0;
 		}
+		else
+		{
+			entity.setVelocity(entity.getVelocity().getConj());
+			entityColliding.setVelocity(entityColliding.getVelocity().getConj());
+		}
 		
 	}
 

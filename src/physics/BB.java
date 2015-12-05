@@ -33,5 +33,10 @@ public abstract class BB {
 	}
 	
 
+	public static boolean collisionBallWall(Point position, double radius, Point position2, Object angle) {
+		return false;
+	}
+	
+
 	
 }

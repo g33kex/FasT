@@ -1,5 +1,9 @@
 package game.entities;
 
+import java.util.UUID;
+
+import org.lwjgl.opengl.GL11;
+
 import physics.BBSquare;
 import physics.maths.Angle;
 import physics.maths.C;
@@ -14,6 +18,7 @@ public class Wall extends Entity {
 	
 	public Wall(Point position,double longueur,Angle angle,EntityHandler entityHandler) {
 		super(position, -1,entityHandler);
+		this.name="wall";
 		this.angle=angle;
 		this.longueur = longueur;
 		C c = new C(angle,longueur);
@@ -22,7 +27,12 @@ public class Wall extends Entity {
 	
 	@Override
 	public void render(Render render) {
+		GL11.glColor3d(0.5, 0.1, 0.8);
 		render.drawLine(this.position,this.posMax);
+	}
+
+	public Object getAngle() {
+		return this.angle;
 	}
 
 }

@@ -25,6 +25,7 @@ import render.Render;
 public abstract class Entity 
 {
 	private final UUID uuid;
+	protected String name = "entity";
 	
 	protected Point position;
 	protected C velocity;
@@ -75,7 +76,7 @@ public abstract class Entity
 	protected final Entity entity = this;
 	
 	public Entity(Point position, double mass,EntityHandler entityHandler) {
-		this.uuid = UUID.randomUUID();
+		this.uuid=UUID.randomUUID();
 		this.position=position;
 		this.mass=mass;
 		this.setVelocity(new C(0,0));
@@ -180,6 +181,10 @@ public abstract class Entity
 		if(this instanceof Ball && entity1 instanceof Ball)
 		{
 			return BB.collisionTwoBalls(this.getPosition(),((Ball) this).getRadius(),entity1.getPosition(),((Ball)entity1).getRadius());
+		}
+		if(this instanceof Ball && entity1 instanceof Wall)
+		{
+			return BB.collisionBallWall(this.getPosition(),((Ball) this).getRadius(),entity1.getPosition(),((Wall)entity1).getAngle());
 		}
 
 		//BB.collisionTwoSquares();

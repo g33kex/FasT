@@ -4,6 +4,7 @@ import game.FasT;
 import game.Liquid;
 import game.entities.Ball;
 import game.entities.Entity;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -45,6 +46,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Point;
 import physics.maths.Normal.Unit;
@@ -192,6 +194,12 @@ private void createMenuBar() {
     frame.setJMenuBar(menubar);
 }
 
+JLabel masseVolumiqueLabel = new JLabel();
+public void updateLabels()
+{
+	masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(FasT.getFasT().getPhysicsHandler().liquid.getMasseVolumique()));
+}
+
 private void renderMenu()
 {
 
@@ -247,8 +255,6 @@ private void renderMenu()
     items[0].setSelected(true);
     
     JMenu liquid = new JMenu("liquid");
-    
-    JLabel masseVolumiqueLabel = new JLabel("masse volumique");
     JSlider masseVolumiqueSlider = new JSlider();
     masseVolumiqueSlider.setMinimum(500);
     masseVolumiqueSlider.setMaximum(1500);
@@ -257,6 +263,7 @@ private void renderMenu()
 				@Override
 				public void stateChanged(ChangeEvent e) {
 					FasT.getFasT().getPhysicsHandler().liquid = new Liquid(masseVolumiqueSlider.getValue(),FasT.getFasT().getPhysicsHandler().liquid);
+					updateLabels();
 				}
     		});
     
@@ -271,7 +278,7 @@ private void renderMenu()
     ball.addActionListener(new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			FasT.getFasT().getEntityHandler().spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).toReal(),FasT.getFasT().getEntityHandler()));
+			FasT.getFasT().getEntityHandler().spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),FasT.getFasT().getEntityHandler()));
 		}
     });
     
@@ -300,7 +307,7 @@ private void renderMenu()
 		         if ( e.isPopupTrigger() )
 		         {
 		        	 Entity entity;
-		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).toReal()))!=null)
+		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).mouseToReal()))!=null)
 		        	 {
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
 		        	 }
@@ -320,11 +327,10 @@ private void renderMenu()
 	{
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
-        GL11.glOrtho(0.0, Display.getWidth(), 0.0F,Display.getHeight(), -1.0, 1.0);
+        GL11.glOrtho(-Display.getWidth()/2, Display.getWidth()/2,-Display.getHeight()/2,Display.getHeight()/2, -1.0, 1.0);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
         GL11.glLoadIdentity();
         GL11.glViewport(0, 0, Display.getWidth(), Display.getHeight());
-        
         GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc( GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA );
 		
@@ -363,11 +369,12 @@ private void renderMenu()
 		 GL11.glClearColor(1.0F, 1.0F, 1.0F, 1.0F);
 		 
 		 GL11.glColor3d(0.0F, 0.0F, 0.0F);
-		 
-
 		 GL11.glPushMatrix();
-		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
 		
+		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
+		 GL11.glTranslated(Normal.rx, Normal.ry, 0);
+		// double zoom = 0.00001;
+		// GL11.glOrtho( -width/2*zoom, width/2*zoom, -height/2*zoom, height/2*zoom, -1, 1 );
 		 
 		 GL11.glColor3d(0.4, 0.9, 0.1);
 		 
@@ -375,6 +382,8 @@ private void renderMenu()
 		// this.drawLine(new Point(20,20), new Point(20+100,20));
 		 //FasT.getFasT().getLogger().debug("1 meter = " + Normal.normal(100, Unit.cm));
 		// this.drawLine(new Point(20,40), new Point(20+Normal.toPlan(1),40));
+		 GL11.glColor3d(0,1,0);
+		 this.drawSquare(new Point(-1,-1), new Point(1,1));
 		 
 		 this.drawLine(new Point(1,1).toReal(), new Point(1,1).toReal().add(new Point(1,0)));
 		 this.drawLine(new Point(1,10), new Point(20,10));

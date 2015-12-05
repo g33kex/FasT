@@ -1,5 +1,7 @@
 package physics.maths;
 
+import org.lwjgl.opengl.Display;
+
 public class Point {
 	
 	private double x,y;
@@ -26,6 +28,11 @@ public class Point {
 
 	public Point toReal() {
 		return new Point(Normal.toReal(this.getX()),Normal.toReal(this.getY()));
+	}
+	
+	public Point mouseToReal()
+	{
+		return new Point(Normal.toReal(this.getX()-Display.getWidth()/2-Normal.getXOffset()),Normal.toReal(this.getY()-Display.getHeight()/2-Normal.getYOffset()));
 	}
 
 	public Point add(Point p) {

@@ -12,6 +12,7 @@ public class Angle {
 	}
 
 	public double getRad() {
+		System.out.print(value+"\n");
 		return this.value;
 	}
 	
@@ -36,11 +37,13 @@ public class Angle {
 
 	public static double convertToRad(double deg) {
 		return Math.toRadians(deg);
+		//return Math.toRadians(deg)/Math.PI;
 	}
 	
 	public static double convertToDeg(double rad)
 	{
 		return Math.toDegrees(rad);
+		//return Math.toDegrees(rad*Math.PI);
 	}
 	
 }

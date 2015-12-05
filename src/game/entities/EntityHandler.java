@@ -33,6 +33,19 @@ public class EntityHandler {
 		this.entities.clear();
 	}
 	
+	
+
+	public void clear(String s)
+	{
+		ArrayList<Entity> buffer = new ArrayList<Entity>();
+		for(Entity e : this.entities)
+		{
+			if(e.name ==s)
+				buffer.add(e);
+		}
+		this.entities.removeAll(buffer);
+	}
+	
 	public void destroy(UUID uuid)
 	{
 		this.entities.remove(get(uuid));
@@ -51,14 +64,17 @@ public class EntityHandler {
 	public Entity getEntityUnder(Point pos) {
 		for(Entity b : this.getEntities())
 		{
+			if(b instanceof Ball)
+			{
 			if(BB.distanceBetweenTwoPoints(pos,b.getPosition())<((Ball) b).getRadius())
 			{
 				return b;
 			}	
+			}
 		}
 		return null;
 	}
-	
+
 
 	public ArrayList<Entity> getEntities() {
 		return new ArrayList<Entity>(this.entities);
