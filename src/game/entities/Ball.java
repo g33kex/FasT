@@ -1,12 +1,22 @@
 package game.entities;
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Dictionary;
+import java.util.Enumeration;
+
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
+
+import org.lwjgl.input.Keyboard;
 
 import game.FasT;
+import javafx.scene.input.KeyCode;
 import physics.BBCircle;
 import physics.maths.Angle;
 import physics.maths.C;
@@ -77,7 +87,7 @@ class B extends A {
 		volumeLabel.setText("volume(m^3)="+Maths.dfloor(this.getVolume()));
 	}
 	
-	private JSlider slidermv = new JSlider();
+	public JSlider slidermv = new JSlider();
 	
 	JLabel radiusLabel = new JLabel();
 	JLabel mvLabel = new JLabel();
@@ -90,21 +100,28 @@ class B extends A {
 	private void addToPopupMenu()
 	{
 		JSlider sliderRadius = new JSlider();
-		sliderRadius.setMinimum(1);
-		sliderRadius.setMaximum(30);
-		sliderRadius.setValue((int) this.radius);
+		sliderRadius.setMinimum(10);
+		sliderRadius.setMaximum(400);
+		sliderRadius.setMajorTickSpacing(40);
+		sliderRadius.setPaintTicks(true);
+		sliderRadius.setSnapToTicks(true);
+		sliderRadius.setValue((int)(this.getRadius()*100));
 		sliderRadius.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e) {
-				setRadius(sliderRadius.getValue()/10);
+				setRadius((double)sliderRadius.getValue()/100);
 			}
 		});
 
-		slidermv.setMinimum(1);
-		slidermv.setMaximum(1000);
+		slidermv.setMinimum(0);
+		slidermv.setMaximum(750000000);
+	//	slidermv.setMinorTickSpacing(50);
+		slidermv.setMajorTickSpacing(50000000);
+		slidermv.setPaintTicks(true);
+		slidermv.setSnapToTicks(true);
 		slidermv.setValue((int)this.masseVolumique);
 		slidermv.addChangeListener(new ChangeListener(){
 			public void stateChanged(ChangeEvent e) {
-				setMV(slidermv.getValue());
+				setMV(slidermv.getValue()==0 ? 1 : slidermv.getValue());
 			}	
 		});
 	
@@ -120,8 +137,62 @@ class B extends A {
 		tweak.add(volumeLabel);
 
 		this.updateSizes();
+		//sliderRadius.setFocusable(false);
+		//slidermv.setFocusable(false);
+		slidermv.addKeyListener(new KeyListener()
+				{
+					@Override
+					public void keyTyped(KeyEvent e) {}
+					@Override
+					public void keyPressed(KeyEvent e) {
+						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+						{
+								((JSlider) e.getSource()).setSnapToTicks(false);
+						}}
+					@Override
+					public void keyReleased(KeyEvent e) {
+						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+						{
+							((JSlider) e.getSource()).setSnapToTicks(true);
+						}}});
+		sliderRadius.addKeyListener(new KeyListener()
+		{
+			@Override
+			public void keyTyped(KeyEvent e) {}
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+				{
+						((JSlider) e.getSource()).setSnapToTicks(false);
+				}}
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+				{
+					((JSlider) e.getSource()).setSnapToTicks(true);
+				}}});
+
 		
 		popupMenu.updateUI();
+		/*tweak.addMenuKeyListener(new MenuKeyListener(){
+			@Override
+			public void menuKeyTyped(MenuKeyEvent e) {
+				FasT.getFasT().getLogger().error("key");
+			}
+			@Override
+			public void menuKeyPressed(MenuKeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+				{
+						slidermv.setSnapToTicks(false);
+						slidermv.updateUI();
+				}}
+			@Override
+			public void menuKeyReleased(MenuKeyEvent e) {
+				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+				{
+					slidermv.setSnapToTicks(true);
+					slidermv.updateUI();
+				}}});*/
 	}
 	
 	public Ball(Point position, EntityHandler entityHandler)

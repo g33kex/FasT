@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -257,6 +258,9 @@ private void renderMenu()
     JMenu liquid = new JMenu("liquid");
     JSlider masseVolumiqueSlider = new JSlider();
     masseVolumiqueSlider.setMinimum(500);
+  /*  masseVolumiqueSlider.setMajorTickSpacing(300);
+    masseVolumiqueSlider.setPaintTicks(true);
+    masseVolumiqueSlider.setSnapToTicks(true);*/
     masseVolumiqueSlider.setMaximum(1500);
     masseVolumiqueSlider.addChangeListener(new ChangeListener()
     		{
@@ -319,6 +323,7 @@ private void renderMenu()
 		      }
 		     	   
 		       });
+
 //SOURCE : http://www.coderanch.com/t/450603/GUI/java/display-click-popup-menu-JPanel
 }
        
@@ -448,7 +453,7 @@ private void renderMenu()
 	 * 
 	 */
 
-	/* HTMLEDITOR KIT panelText.add(textPane);
+	/* HTMLEDITOR KIT panelText.add(textPane);*
 	JEditorPane editorPane = new JEditorPane("text/html", "The rain in <a href='http://foo.com/'>"
 				+"Spain</a> falls mainly on the <a href='http://bar.com/'>plain</a>.");
 	// editorPane.setText("<img src=\"http://latex.codecogs.com/svg.latex?1+sin(x)\" border=\"0\">");

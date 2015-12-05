@@ -16,11 +16,12 @@ public class Physics {
 
 	//private double g = 9.81; // N/kg
 	private final C g = new C(new Angle(Angle.convertToRad(-90)),9.81);
+	private final double G = 6.67*Math.pow(10,-11);
 	
 	public boolean GROUND = false;
 	
 	
-	public int simulationLevel = 1; // 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
+	public int simulationLevel = 0; // 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
 	public Liquid liquid; // Liquid in the experiment zone
 	
 	
@@ -39,7 +40,7 @@ public class Physics {
 		
 		if(entity.getMass()==-1)
 			return false;
-		this.updatePosition(entity, deltat);
+		this.updatePosition(entity, deltat, entities);
 		
 		return true;
 		
@@ -74,7 +75,7 @@ public class Physics {
 		return collideList;
 	}
 
-	private void updatePosition(Entity entity, double deltat)
+	private void updatePosition(Entity entity, double deltat,ArrayList<Entity> entities)
 	{
 		//FasT.getFasT().getLogger().info("New tic after " + deltat );//+ "("+deltat2+")" + "'"+(deltat2-deltat)+"'");
 				double time = deltat; // s
@@ -147,7 +148,7 @@ public class Physics {
 				
 				
 				//Intégrale de a
-				C F = getForces(entity);
+				C F = getForces(entity,entities);
 				for(C f : entity.getInstantForces())
 				{
 					F = F.sum(f.div(time));
@@ -166,11 +167,30 @@ public class Physics {
 				entity.setPosition(new Point(x,y));
 	}
 	
-	private C getForces(Entity entity)
+	private C getForces(Entity entity, ArrayList<Entity> entities)
 	{
 		ArrayList<C> forces = new ArrayList<C>();
-		forces.add(weight(entity.getMass())); // P=mg 
-		forces.add(archimede(this.liquid.getMasseVolumique(),((Ball) entity).getVolume(),g));
+		
+		if(simulationLevel==0)
+		{
+			for(Entity e : entities)
+			{
+				if(e==entity || !(entity instanceof Ball) || !(e instanceof Ball))
+					continue;
+				FasT.getFasT().getLogger().warning(G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2));
+				C pp = new C(entity.getPosition().getX()-e.getPosition().getX(),entity.getPosition().getY()-e.getPosition().getY());
+				forces.add(new C(pp.getTheta(),-G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2)));
+			}
+		}
+		
+		if(simulationLevel>=1)
+		{
+			forces.add(weight(entity.getMass())); // P=mg 
+		}
+		if(simulationLevel>=2)
+		{
+			forces.add(archimede(this.liquid.getMasseVolumique(),((Ball) entity).getVolume(),g));
+		}
 		//forces.add(drag(entity.getVelocity(),10000000));
 		//FasT.getFasT().getLogger().debug(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
 		//forces.add(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));

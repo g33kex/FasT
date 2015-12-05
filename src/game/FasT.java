@@ -220,6 +220,7 @@ public class FasT {
 	{
 		while(Keyboard.next())
 		{
+			
 			if(!Keyboard.getEventKeyState())
 				continue;
 			
@@ -306,6 +307,7 @@ public class FasT {
 		//TODO : Mouse
 		while(Mouse.next())
 		{
+			
 			//log.warning("Wheel speed="+Mouse.getEventDWheel());
 			if(pos==true)
 			{

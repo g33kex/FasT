@@ -16,6 +16,7 @@ import physics.BB;
 import physics.BBCircle;
 import physics.Physics;
 import physics.maths.C;
+import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Normal.Unit;
 import physics.maths.Point;
@@ -139,7 +140,7 @@ public abstract class Entity
 
 	public void setVelocity(C velocity) {
 		this.velocity = velocity;
-		this.speedLabel.setText("speed(m/s)="+this.getVelocity().getMod());
+		this.speedLabel.setText("speed(m/s)="+Maths.dfloor(this.getVelocity().getMod()));
 	}
 	
 	public void applyForce(C c)
