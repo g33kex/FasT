@@ -1,57 +1,42 @@
 package render;
 
-import game.FasT;
-import game.Liquid;
-import game.entities.Ball;
-import game.entities.Entity;
-import javafx.application.Platform;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Group;
-import javafx.scene.Scene;
-import javafx.scene.text.Text;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.ByteBuffer;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.plaf.basic.BasicComboBoxUI.ItemHandler;
-import javax.swing.text.Document;
-import javax.swing.text.html.HTMLEditorKit;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import game.FasT;
+import game.entities.Ball;
+import game.entities.Box;
+import game.entities.Entity;
 import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Point;
-import physics.maths.Normal.Unit;
-
 
 
 public class Render {
@@ -76,6 +61,9 @@ public class Render {
 		 return this.frame;
 	 }
 	 
+		public  Canvas getCanvas() {
+			return this.glCanvas;
+		}
 
 	public Render(){
 		
@@ -198,7 +186,7 @@ private void createMenuBar() {
 JLabel masseVolumiqueLabel = new JLabel();
 public void updateLabels()
 {
-	masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(FasT.getFasT().getPhysicsHandler().liquid.getMasseVolumique()));
+	masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().getMasseVolumique()));
 }
 
 private void renderMenu()
@@ -229,7 +217,7 @@ private void renderMenu()
     
     
     
-    String[] states = {"chute libre","chute dans un liquide","chute avec frottements","chute avec rebonds"};
+    String[] states = {"univers","chute libre","chute dans un liquide","chute avec frottements","chute avec rebonds"};
     JRadioButtonMenuItem[] items = new JRadioButtonMenuItem[states.length];
     ButtonGroup modeGroup = new ButtonGroup();
     
@@ -238,7 +226,7 @@ private void renderMenu()
 			  for ( int i = 0; i < items.length; i++ )
 			  {
 		            if ( e.getSource() == items[ i ] ) {
-		               FasT.getFasT().getPhysicsHandler().simulationLevel=i+1;
+		               FasT.getFasT().getPhysicsHandler().simulationLevel=i;
 		               return;
 		            }
 			  }
@@ -253,7 +241,7 @@ private void renderMenu()
     	items[i].addActionListener(modeListener);
     }
     
-    items[0].setSelected(true);
+    items[1].setSelected(true);
     
     JMenu liquid = new JMenu("liquid");
     JSlider masseVolumiqueSlider = new JSlider();
@@ -266,7 +254,7 @@ private void renderMenu()
     		{
 				@Override
 				public void stateChanged(ChangeEvent e) {
-					FasT.getFasT().getPhysicsHandler().liquid = new Liquid(masseVolumiqueSlider.getValue(),FasT.getFasT().getPhysicsHandler().liquid);
+					((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().setMasseVolumique(masseVolumiqueSlider.getValue());
 					updateLabels();
 				}
     		});
@@ -313,6 +301,7 @@ private void renderMenu()
 		        	 Entity entity;
 		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).mouseToReal()))!=null)
 		        	 {
+		  
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
 		        	 }
 		        	 else
@@ -540,6 +529,9 @@ private void renderMenu()
 
 		Display.update();
 	}
+
+
+
  
  
 }

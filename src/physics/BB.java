@@ -36,6 +36,14 @@ public abstract class BB {
 	public static boolean collisionBallWall(Point position, double radius, Point position2, Object angle) {
 		return false;
 	}
+
+	public static boolean collisionBallSquare(Point position, double radius, Point position2, Point max) {
+		return position.getX()+radius>=position2.getX() && position.getY()+radius>=position2.getY() && position.getX()<=max.getX()+radius && position.getY()<=max.getY()+radius;
+	}
+
+	public static boolean pointInSquare(Point position, Point position2, Point max) {
+		return position.getX()>=position2.getX() && position.getY()>=position2.getY() && position.getX()<=max.getX() && position.getY()<=max.getY();
+	}
 	
 
 	

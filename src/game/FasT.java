@@ -25,6 +25,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import com.sun.glass.ui.Cursor;
+
 import physics.BB;
 import physics.Physics;
 import physics.maths.Angle;
@@ -96,7 +98,7 @@ public class FasT {
 	
 	
 	private UUID theBall;
-	private UUID theBox = UUID.randomUUID();
+	public UUID theBox = UUID.randomUUID();
 	
 	public FasT() throws LWJGLException {
 		this.on=true;
@@ -113,8 +115,6 @@ public class FasT {
 	
 	private void init() throws LWJGLException
 	{
-		
-		this.physics.liquid=Liquid.air();
 		render.init(this.width,this.height,this.title);
 
 		this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
@@ -122,7 +122,7 @@ public class FasT {
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
 		this.spawnWalls();
-	
+		entityHandler.spawn(new Box(new Point(1,1),new Point(2,2),1,Liquid.WATER, this.entityHandler));
 		render.updateLabels();
 	}
 	
@@ -130,7 +130,7 @@ public class FasT {
 	{
 		entityHandler.destroy(this.theBox);
 	//	this.theBox=entityHandler.spawn(new Box(new Point(-this.width/2,-this.height/2).toReal(), new Point(this.width/2,this.height/2).toReal(),4,this.entityHandler));
-		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,this.entityHandler));
+		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,Liquid.AIR, this.entityHandler));
 		/*entityHandler.clear("wall");
 		entityHandler.spawn(new Wall(new Point(0,0).toReal(),Normal.toReal(this.width),new Angle(0),this.entityHandler));
 		entityHandler.spawn(new Wall(new Point(1,0).toReal(),Normal.toReal(this.height),new Angle(Math.PI/2),this.entityHandler));
@@ -307,8 +307,17 @@ public class FasT {
 		//TODO : Mouse
 		while(Mouse.next())
 		{
+			/*for(Entity entityc : this.getEntityHandler().getEntities())
+			{
+				if(BB.distanceBetweenTwoPoints(new Point(Mouse.getX(),Mouse.getY()).mouseToReal().toPlan(),entityc.getPosition().toPlan())<=5)
+				{
+					FasT.getFasT().getRender().getFrame().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.SW_RESIZE_CURSOR));
+				}
+			}*/
+			
 			
 			//log.warning("Wheel speed="+Mouse.getEventDWheel());
+			//Let's handle the mouse wheel (to change the zoom)
 			if(pos==true)
 			{
 				if(Mouse.getEventDWheel()>1)
@@ -336,11 +345,11 @@ public class FasT {
 				}
 			}
 			
-			
+			//Handeling home made drag events
 			if(!Mouse.isButtonDown(0))
 			{
 				for(Entity entity : this.entityHandler.getEntities()) {
-					entity.setBeingDragged(false);
+					entity.setBeingDragged(false, new Point(Mouse.getEventDX(),Mouse.getEventDY()).mouseToReal());
 				}
 			}
 			
@@ -350,16 +359,15 @@ public class FasT {
 				Entity e;
 				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal())) != null)
 				{
-					e.setBeingDragged(true);
+						e.setBeingDragged(true, new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal());
 				}
 			}
 			boolean r = false;
 			for(Entity b : this.entityHandler.getEntities())
 			{
-				if(b.getbeingDraged())
+				if(b.getBeingDragged())
 				{
-					b.drag(new Point(Mouse.getEventDX(),Mouse.getEventDY()).toReal(),Mouse.getEventNanoseconds());
-					r=true;
+					r=b.drag(new Point(Mouse.getEventDX(),Mouse.getEventDY()).toReal(),Mouse.getEventNanoseconds());
 					break;
 				}
 			}
@@ -367,6 +375,11 @@ public class FasT {
 			if(r)
 				continue;
 			
+			Entity entityd;
+			if(!((entityd = this.getEntityHandler().getEntityUnder(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())) != null && entityd.hoover(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())))
+				this.getRender().getCanvas().setCursor(java.awt.Cursor.getDefaultCursor());
+			
+			//Handle moving panel when draging with shift enabled
 			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
 			{
 				Normal.x+=Mouse.getEventDX();
@@ -430,8 +443,6 @@ public class FasT {
 		{
 			e.render(render);
 		}
-		
-		physics.liquid.render(render);
 		
 		render.EndRender();
 		

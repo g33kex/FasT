@@ -1,5 +1,8 @@
 package game.entities;
 
+import java.awt.AWTException;
+import java.awt.Cursor;
+import java.awt.HeadlessException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Dictionary;
@@ -111,11 +114,10 @@ class B extends A {
 				setRadius((double)sliderRadius.getValue()/100);
 			}
 		});
-
 		slidermv.setMinimum(0);
-		slidermv.setMaximum(750000000);
+		slidermv.setMaximum(7500);
 	//	slidermv.setMinorTickSpacing(50);
-		slidermv.setMajorTickSpacing(50000000);
+		slidermv.setMajorTickSpacing(500);
 		slidermv.setPaintTicks(true);
 		slidermv.setSnapToTicks(true);
 		slidermv.setValue((int)this.masseVolumique);
@@ -141,6 +143,7 @@ class B extends A {
 		//slidermv.setFocusable(false);
 		slidermv.addKeyListener(new KeyListener()
 				{
+					boolean BOOST = false;
 					@Override
 					public void keyTyped(KeyEvent e) {}
 					@Override
@@ -148,13 +151,22 @@ class B extends A {
 						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
 						{
 								((JSlider) e.getSource()).setSnapToTicks(false);
-						}}
+						}
+						else if(e.getKeyCode()==KeyEvent.VK_ALT)
+						{
+							BOOST = ! BOOST;
+							((JSlider) e.getSource()).setMaximum(BOOST ? 750000000 : 7500);
+							((JSlider)e.getSource()).setValue(((JSlider)e.getSource()).getValue() * (BOOST ? 100000 : 1/100000));
+							((JSlider) e.getSource()).setMajorTickSpacing(BOOST ? 50000000 : 500);
+						}
+					}
 					@Override
 					public void keyReleased(KeyEvent e) {
 						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
 						{
 							((JSlider) e.getSource()).setSnapToTicks(true);
-						}}});
+						}
+					}});
 		sliderRadius.addKeyListener(new KeyListener()
 		{
 			@Override
@@ -172,6 +184,7 @@ class B extends A {
 					((JSlider) e.getSource()).setSnapToTicks(true);
 				}}});
 
+		
 		
 		popupMenu.updateUI();
 		/*tweak.addMenuKeyListener(new MenuKeyListener(){
@@ -216,6 +229,7 @@ class B extends A {
 		super(position,0.0312,entityHandler);
 		this.radius=radius;
 		this.boundingBox = new BBCircle(this.position, radius);
+		this.setMV(1.9*Math.pow(10, 27));
 		this.addToPopupMenu();
 	}
 
@@ -226,5 +240,50 @@ class B extends A {
 		render.drawLines(this.positions);
 		//render.drawLine(this.getPosition(), new Point(this.getPosition().getX()+this.getVelocity().getRe(),this.getPosition().getY()+this.getVelocity().getIm()));
 	}
+	
+	public double getVolumeImmerged(Box box) {
+		double dh = this.getPosition().getY()-(box.getPosition().getY()+((box.getMax().getY()-box.getPosition().getY())*box.getLiquid().getLevel()));
+		if(dh>=this.getRadius() || box.getLiquid().getLevel()==0)
+		{
+			return 0;
+		}
+		if(dh<=-this.getRadius())
+		{
+			return this.getVolume();
+		}
 
+		double h = this.getRadius()-dh;
+
+		return Math.PI/3*Math.pow(h, 2)*(3*this.getRadius()-h);
+	}
+
+	@Override
+	public boolean drag(Point p,long currentNanoTime)
+	{
+		double constante = 3*2;
+		double time = currentNanoTime/Math.pow(10, 9);
+		double deltat = time-lastUpdateTime;
+		//FasT.getFasT().getLogger().debug(deltat);
+		
+		C c = new C(p.getX(),p.getY());
+		C c1 = new C(c.getTheta(),c.getRho()/deltat);
+		
+		//FasT.getFasT().getLogger().debug(deltat);
+		
+		
+		this.setVelocity(c1);
+		this.setPosition(this.getPosition().add(p));
+		//USE RHO BETWEEN LAST POINT AND THISONE TO CALCULATE SPEED THEN PROCESS THE ANGLE WITH THE VECTOR 
+		this.positions.clear();
+		lastUpdateTime=time;
+		return true;
+	}
+	
+
+	public boolean hoover(Point p)
+	{
+		FasT.getFasT().getRender().getCanvas().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return true;
+	}
+	
 }

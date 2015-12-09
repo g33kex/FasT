@@ -10,19 +10,19 @@ import physics.maths.Point;
 import game.FasT;
 import game.Liquid;
 import game.entities.Ball;
+import game.entities.Box;
 import game.entities.Entity;
 
 public class Physics {
-
+//http://warmaths.fr/SCIENCES/unites/VOL%20CAPA/spher2.htm
 	//private double g = 9.81; // N/kg
 	private final C g = new C(new Angle(Angle.convertToRad(-90)),9.81);
-	private final double G = 6.67*Math.pow(10,-11);
+	private final double G = 6.67384*Math.pow(10,-11);
 	
 	public boolean GROUND = false;
 	
 	
-	public int simulationLevel = 0; // 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
-	public Liquid liquid; // Liquid in the experiment zone
+	public int simulationLevel = 2; // 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
 	
 	
 	
@@ -54,8 +54,8 @@ public class Physics {
 		}
 		else
 		{
-			entity.setVelocity(entity.getVelocity().getConj());
-			entityColliding.setVelocity(entityColliding.getVelocity().getConj());
+			/*entity.setVelocity(entity.getVelocity().getConj());
+			entityColliding.setVelocity(entityColliding.getVelocity().getConj());*/
 		}
 		
 	}
@@ -171,25 +171,27 @@ public class Physics {
 	{
 		ArrayList<C> forces = new ArrayList<C>();
 		
-		if(simulationLevel==0)
+		if(simulationLevel>=0)
 		{
 			for(Entity e : entities)
 			{
-				if(e==entity || !(entity instanceof Ball) || !(e instanceof Ball))
+				if(e==entity || !(entity instanceof Ball) || !(e instanceof Ball) || BB.distanceBetweenTwoPoints(entity.getPosition(),e.getPosition())<=(((Ball) e).getRadius())+((Ball)entity).getRadius())
 					continue;
 				FasT.getFasT().getLogger().warning(G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2));
 				C pp = new C(entity.getPosition().getX()-e.getPosition().getX(),entity.getPosition().getY()-e.getPosition().getY());
 				forces.add(new C(pp.getTheta(),-G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2)));
 			}
 		}
-		
 		if(simulationLevel>=1)
 		{
 			forces.add(weight(entity.getMass())); // P=mg 
 		}
 		if(simulationLevel>=2)
 		{
-			forces.add(archimede(this.liquid.getMasseVolumique(),((Ball) entity).getVolume(),g));
+			for(Box box : this.getBoxAround(entity,entities))
+			{
+				forces.add(archimede(box.getLiquid().getMasseVolumique(),((Ball) entity).getVolumeImmerged(box),g));
+			}
 		}
 		//forces.add(drag(entity.getVelocity(),10000000));
 		//FasT.getFasT().getLogger().debug(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
@@ -205,6 +207,21 @@ public class Physics {
 		return sumForces;
 	}
 	
+	private ArrayList<Box> getBoxAround(Entity entity,ArrayList<Entity> entities) {
+		ArrayList<Box> boxes = new ArrayList<Box>();
+		for(Entity e : entities)
+		{
+			if(e instanceof Box && entity instanceof Ball)
+			{
+				if(entity.isInside(e))
+				{
+					boxes.add((Box) e);
+				}
+			}
+		}
+		return boxes;
+	}
+
 	private C archimede(double fluid,double V,C g)
 	{
 		//b = constante de résistance (kg/s)

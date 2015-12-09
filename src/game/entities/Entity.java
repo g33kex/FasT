@@ -12,6 +12,7 @@ import javax.swing.JPopupMenu;
 
 import game.Color;
 import game.FasT;
+import game.Liquid;
 import physics.BB;
 import physics.BBCircle;
 import physics.Physics;
@@ -52,7 +53,7 @@ public abstract class Entity
 	public JPopupMenu getPopupMenu() { return this.popupMenu;}
 	protected JMenu tweak = new JMenu("tweak");
 	
-	private JLabel speedLabel = new JLabel();
+	protected JLabel speedLabel = new JLabel();
 	
 	protected final void createPopupMenu()
 	{
@@ -66,9 +67,7 @@ public abstract class Entity
 		
 
 		this.popupMenu.add(tweak);
-		
 		this.popupMenu.add(speedLabel);
-		
 		this.popupMenu.add(delete);
 		
 	}
@@ -92,35 +91,23 @@ public abstract class Entity
 		this.position = p;
 	}
 	
-	public void setBeingDragged(boolean isBeingDragged)
+	public void setBeingDragged(boolean isBeingDragged, Point point)
 	{
 		this.isBeingDragged=isBeingDragged;
 	}
 	
-	public boolean getbeingDraged()
+	public boolean getBeingDragged()
 	{
 		return this.isBeingDragged;
 	}
 	
-	private double lastUpdateTime=0;
-	public void drag(Point p,long currentNanoTime) {
-		double constante = 3*2;
-		double time = currentNanoTime/Math.pow(10, 9);
-		double deltat = time-lastUpdateTime;
-		//FasT.getFasT().getLogger().debug(deltat);
-		
-		C c = new C(p.getX(),p.getY());
-		C c1 = new C(c.getTheta(),c.getRho()/deltat);
-		
-		//FasT.getFasT().getLogger().debug(deltat);
-		
-		
-		this.setVelocity(c1);
-		this.setPosition(this.getPosition().add(p));
-		//USE RHO BETWEEN LAST POINT AND THISONE TO CALCULATE SPEED THEN PROCESS THE ANGLE WITH THE VECTOR 
-		this.positions.clear();
-		lastUpdateTime=time;
+	protected double lastUpdateTime=0;
+	
+	public boolean drag(Point p,long currentNanoTime) {
+		return false;
 	}
+	
+	public boolean hoover(Point p) {return false;}
 
 	//TODO : m/S = cm/S ???? 
 	public Point getPosition()
@@ -187,6 +174,10 @@ public abstract class Entity
 		{
 			return BB.collisionBallWall(this.getPosition(),((Ball) this).getRadius(),entity1.getPosition(),((Wall)entity1).getAngle());
 		}
+		if(this instanceof Ball && entity1 instanceof Box)
+		{
+			
+		}
 
 		//BB.collisionTwoSquares();
 		//BB.collisionSquareBall();
@@ -197,6 +188,17 @@ public abstract class Entity
 		
 		
 	}
+	
+	public boolean isInside(Entity entity1)
+	{
+		if(this instanceof Ball && entity1 instanceof Box)
+		{
+			return BB.collisionBallSquare(this.getPosition(),((Ball)this).getRadius(),entity1.getPosition(),((Box) entity1).getMax());
+		}
+		
+		return this.collidesWith(entity1);
+	}
+
 
 
 

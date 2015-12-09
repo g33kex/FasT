@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.lwjgl.input.Mouse;
 
+import game.FasT;
 import physics.BB;
 import physics.maths.Point;
 
@@ -70,6 +71,13 @@ public class EntityHandler {
 			{
 				return b;
 			}	
+			}
+			else if(b instanceof Box)
+			{
+				if(BB.pointInSquare(pos,((Box)b).getPosition(),((Box)b).getMax()) && !(b.getUUID()==FasT.getFasT().theBox))
+						{
+					return b;
+						}
 			}
 		}
 		return null;

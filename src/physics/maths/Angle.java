@@ -12,7 +12,6 @@ public class Angle {
 	}
 
 	public double getRad() {
-		System.out.print(value+"\n");
 		return this.value;
 	}
 	
