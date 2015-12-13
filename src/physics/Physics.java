@@ -177,7 +177,7 @@ public class Physics {
 			{
 				if(e==entity || !(entity instanceof Ball) || !(e instanceof Ball) || BB.distanceBetweenTwoPoints(entity.getPosition(),e.getPosition())<=(((Ball) e).getRadius())+((Ball)entity).getRadius())
 					continue;
-				FasT.getFasT().getLogger().warning(G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2));
+				//FasT.getFasT().getLogger().warning(G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2));
 				C pp = new C(entity.getPosition().getX()-e.getPosition().getX(),entity.getPosition().getY()-e.getPosition().getY());
 				forces.add(new C(pp.getTheta(),-G*e.getMass()*entity.getMass()/Math.pow(BB.distanceBetweenTwoPoints(e.getPosition(), entity.getPosition()),2)));
 			}
@@ -185,6 +185,7 @@ public class Physics {
 		if(simulationLevel>=1)
 		{
 			forces.add(weight(entity.getMass())); // P=mg 
+			//FasT.getFasT().getLogger().debug("weight="+weight(entity.getMass()));
 		}
 		if(simulationLevel>=2)
 		{
@@ -192,6 +193,16 @@ public class Physics {
 			{
 				forces.add(archimede(box.getLiquid().getMasseVolumique(),((Ball) entity).getVolumeImmerged(box),g));
 			}
+		}
+		if(simulationLevel>=3)
+		{
+			for(Box box : this.getBoxAround(entity,entities))
+			{
+				if(box.getUUID()==FasT.getFasT().theBox)
+					continue;
+				forces.add(frottements(box.getLiquid(),entity.getVelocity(),entity.getFlow(),(box.getMax().getX()-box.getMax().getY())/2));
+			}
+
 		}
 		//forces.add(drag(entity.getVelocity(),10000000));
 		//FasT.getFasT().getLogger().debug(wind(Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
@@ -226,6 +237,26 @@ public class Physics {
 	{
 		//b = constante de résistance (kg/s)
 		return g.product(-fluid*V);
+	}
+	
+	private C frottements(Liquid fluid,C v,double diam,double r)
+	{
+		double Re = v.getMod()*r*fluid.getMasseVolumique()/fluid.getVisc();
+		//FasT.getFasT().getLogger().debug("Re="+Re);
+		//return Re;
+		if(Re<1)
+		{
+			double k = fluid.getVisc()*diam*3*Math.PI;// Formule de STOCKES
+			FasT.getFasT().getLogger().debug("vk="+v.product(-k));
+		
+			return v.product(-k);
+		}
+		else
+		{
+			FasT.getFasT().getLogger().debug("Re="+Re);
+			double k = 0.44*Math.PI*fluid.getMasseVolumique()/8*Math.pow(diam, 2);
+			return v.product(v).product(-k);
+		}
 	}
 	
 	private C wind(double surface)

@@ -82,6 +82,12 @@ class B extends A {
 		return (4*Math.PI*Math.pow(this.radius,3))/3;
 	}
 	
+	@Override
+	public double getFlow()
+	{
+		return this.radius*2;
+	}
+	
 	public void updateSizes()
 	{
 		radiusLabel.setText("radius(m)="+Maths.dfloor(getRadius()));
@@ -282,7 +288,14 @@ class B extends A {
 
 	public boolean hoover(Point p)
 	{
+	//	FasT.getFasT().getLogger().debug("hoovering ball" + (FasT.getFasT().getRender().getCanvas().hasFocus() ? " focus" : " no focus"));
+		//FasT.getFasT().getRender().getFrame().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		FasT.getFasT().getRender().getCanvas().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		return true;
+	}
+	
+	public boolean shouldMenu(Point p)
+	{
 		return true;
 	}
 	

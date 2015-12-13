@@ -303,7 +303,20 @@ public class FasT {
 	private boolean pos=true;
 	private void handleMouse() 
 	{
-		
+		boolean c = true;
+		for(Entity entitye : this.getEntityHandler().getEntities())
+		{
+			 if(entitye.getBeingDragged())
+				 c=false;
+					 
+		}
+		Entity entityd;
+		if(c && !((entityd = this.getEntityHandler().getEntityUnder(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())) != null && (entityd.hoover(new Point(Mouse.getX(),Mouse.getY()).mouseToReal()))))
+		{
+			//FasT.getFasT().getRender().getFrame().setCursor(java.awt.Cursor.getDefaultCursor());
+				this.getRender().getCanvas().setCursor(java.awt.Cursor.getDefaultCursor());
+		}
+			
 		//TODO : Mouse
 		while(Mouse.next())
 		{
@@ -375,9 +388,9 @@ public class FasT {
 			if(r)
 				continue;
 			
-			Entity entityd;
+			/*Entity entityd;
 			if(!((entityd = this.getEntityHandler().getEntityUnder(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())) != null && entityd.hoover(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())))
-				this.getRender().getCanvas().setCursor(java.awt.Cursor.getDefaultCursor());
+				this.getRender().getCanvas().setCursor(java.awt.Cursor.getDefaultCursor());*/
 			
 			//Handle moving panel when draging with shift enabled
 			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))

@@ -125,7 +125,7 @@ public class Render {
 	     panelHelp.setBackground(Color.RED);
 	  
          	HelpBrowser browser = new HelpBrowser();
-         	browser.setHomePage("http://www.example.com/");
+         	browser.setHomePage(FasT.class.getResource("/website/index.html").toExternalForm());
            
          panelHelp.add(browser);
 	     
@@ -299,9 +299,8 @@ private void renderMenu()
 		         if ( e.isPopupTrigger() )
 		         {
 		        	 Entity entity;
-		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).mouseToReal()))!=null)
+		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).mouseToReal()))!=null && entity.shouldMenu(new Point(e.getX(),height-e.getY()).mouseToReal()))
 		        	 {
-		  
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
 		        	 }
 		        	 else
@@ -377,10 +376,13 @@ private void renderMenu()
 		 //FasT.getFasT().getLogger().debug("1 meter = " + Normal.normal(100, Unit.cm));
 		// this.drawLine(new Point(20,40), new Point(20+Normal.toPlan(1),40));
 		 GL11.glColor3d(0,1,0);
-		 this.drawSquare(new Point(-1,-1), new Point(1,1));
+		 this.drawSquare(new Point(-1,-1).toReal(), new Point(1,1).toReal());
 		 
-		 this.drawLine(new Point(1,1).toReal(), new Point(1,1).toReal().add(new Point(1,0)));
-		 this.drawLine(new Point(1,10), new Point(20,10));
+		// this.drawLine(new Point(1,1).toReal(), new Point(1,1).toReal().add(new Point(1,0)));
+		// this.drawLine(new Point(1,10), new Point(20,10));
+		 
+		 GL11.glColor3d(0.02,0.8,0.95);
+		 this.drawLine(new Point(10,10).mouseToReal(), new Point(10,10).mouseToReal().add(new Point(1,0)));
 		 
 		 //Draw text to show this is 1 meter
 	}

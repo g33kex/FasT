@@ -54,6 +54,7 @@ public abstract class Entity
 	protected JMenu tweak = new JMenu("tweak");
 	
 	protected JLabel speedLabel = new JLabel();
+	protected JLabel ecLabel = new JLabel();
 	
 	protected final void createPopupMenu()
 	{
@@ -68,6 +69,7 @@ public abstract class Entity
 
 		this.popupMenu.add(tweak);
 		this.popupMenu.add(speedLabel);
+		this.popupMenu.add(ecLabel);
 		this.popupMenu.add(delete);
 		
 	}
@@ -124,10 +126,17 @@ public abstract class Entity
 	public C getVelocity() {
 		return velocity;
 	}
+	
+	public double getFlow()
+	{
+		return 0;
+	}
 
 	public void setVelocity(C velocity) {
 		this.velocity = velocity;
 		this.speedLabel.setText("speed(m/s)="+Maths.dfloor(this.getVelocity().getMod()));
+		double ec = Maths.dfloor(this.getMass()/2*Math.pow(this.getVelocity().getMod(),2));
+		this.ecLabel.setText("Ec(J)="+ec);
 	}
 	
 	public void applyForce(C c)
@@ -199,6 +208,7 @@ public abstract class Entity
 		return this.collidesWith(entity1);
 	}
 
+	public boolean shouldMenu(Point p){return false;}
 
 
 
