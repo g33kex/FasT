@@ -82,6 +82,10 @@ class B extends A {
 		return (4*Math.PI*Math.pow(this.radius,3))/3;
 	}
 	
+	public double getAire() {
+		return 4*Math.PI*Math.pow(this.getRadius(),2);
+	}
+	
 	@Override
 	public double getFlow()
 	{
@@ -226,7 +230,7 @@ class B extends A {
 		//this.velocity=new C(new Angle(Angle.convertToRad(90)),20).sum(new C(new Angle(Angle.convertToRad(0)),30));
 		//this.applyForce(new C(new Angle(Angle.convertToRad(35)),100000000));
 		this.positions.add(this.position);
-		
+		this.velocity=new C(new Angle(Angle.convertToRad(90)),8.33);
 		this.addToPopupMenu();
 	}
 	
@@ -298,5 +302,6 @@ class B extends A {
 	{
 		return true;
 	}
+	
 	
 }

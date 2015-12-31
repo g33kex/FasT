@@ -165,6 +165,7 @@ public abstract class Entity
 				//lastUpdateTime=System.nanoTime()/Math.pow(10, 9);
 			}
 		}
+		
 		this.instantForces.clear();
 	}
 

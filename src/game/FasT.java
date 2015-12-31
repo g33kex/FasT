@@ -85,7 +85,22 @@ public class FasT {
 	
 	private volatile double lastUpdateTime=-1;
 	
-	public void setPaused(boolean b) {this.pause=b;this.render.play.setText(b ? "play" : "pause");}
+	public void setPaused(boolean b) {this.pause=b;this.render.play.setText(b ? "play" : "pause");
+	
+	if(this.isPaused())
+	{
+		double tmpy = 0;
+		for(Point p : entityHandler.get(this.theBall).positions)
+		{
+			if(p.getY()>tmpy)
+				tmpy=p.getY();
+		}
+		double r = tmpy-entityHandler.get(this.theBall).positions.get(0).getY();
+		this.getLogger().debug("H = "+r);
+	}
+	
+	
+	}
 	public boolean isPaused() {return this.pause;}
 
 	
@@ -116,7 +131,6 @@ public class FasT {
 	private void init() throws LWJGLException
 	{
 		render.init(this.width,this.height,this.title);
-
 		this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
 		//entityHandler.spawn(new Ball(new Point(40,500)));
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
