@@ -3,18 +3,26 @@ package render;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -22,18 +30,25 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
+import com.sun.glass.ui.Application;
+
 import game.FasT;
+import game.Liquid;
 import game.entities.Ball;
 import game.entities.Box;
 import game.entities.Entity;
+import physics.maths.Angle;
+import physics.maths.C;
 import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Point;
@@ -46,11 +61,12 @@ public class Render {
 	
 	
 	 private JFrame frame = new JFrame();
-	 private final JPanel panel = new JPanel();
+	 public final JPanel panel = new JPanel();
 	 private final Canvas glCanvas = new Canvas();
 	 private final JPanel panelLeft = new JPanel();
 	 private final JPanel panelOptions = new JPanel();
 	 private final JPanel panelHelp = new JPanel();
+	 public final JPanel BPanel = new JPanel();
 	 
 	 public final JMenuItem play = new JMenuItem();
      
@@ -101,18 +117,22 @@ public class Render {
 	{
 		//Creating JFRAME
 		frame = new JFrame();
+			
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle(this.getWindowTitle());
 
 		//Setting dimension and putting it on the center of the screen
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    frame.setResizable(true);
-	    frame.setMaximumSize(new Dimension(1280,773));
-	    frame.setMinimumSize(new Dimension(765,465));
+	 //  frame.setMaximumSize(new Dimension(1280,773));
+
+	  frame.setMinimumSize(new Dimension(765,465));
+	   //dispose() is the reason that this trick doesn't work with videos
+     
 	    
 	    //Set the layout of the JFRAME
 	    frame.getContentPane().setLayout(new BorderLayout(0,0));
-	    
+	  
 	    //End with JFRAME -----
 	    
 
@@ -130,7 +150,7 @@ public class Render {
          panelHelp.add(browser);
 	     
          //We create the main panel
-	     panel.setLayout(new BorderLayout(0, 0));
+	     panel.setLayout(new BorderLayout(0,0));
 	     panel.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 	     panel.setBackground(Color.DARK_GRAY);
 	     panel.setRequestFocusEnabled(true);
@@ -139,9 +159,23 @@ public class Render {
 	     	glCanvas.setFocusable(true);
 	     	glCanvas.setBackground(Color.DARK_GRAY);
 	     	glCanvas.setIgnoreRepaint(true);
-	     	
-	     panel.add(glCanvas);
-
+	     	//glCanvas.setBounds(0, 0, this.width, this.height-100);
+	     panel.add(glCanvas,BorderLayout.CENTER);
+		    BPanel.setPreferredSize(new Dimension(panel.getWidth(),200));
+		    BPanel.setBackground(Color.BLACK);
+		    BPanel.setVisible(true);
+		 panel.add(BPanel,BorderLayout.SOUTH);
+	     BPanel.setVisible(false);
+		 panel.addComponentListener(new ComponentAdapter() 
+		 {  
+		         public void componentResized(ComponentEvent evt) {
+		             Component c = (Component)evt.getSource();
+		           //  glCanvas.setSize(c.getWidth(), c.getHeight());
+		             flag=true;
+		         }
+		 });
+		 
+		 
 	     //Panelleft is actually useless
 	     panelLeft.setLayout(new BorderLayout(0,0));
 	     panelLeft.add(panel,BorderLayout.CENTER);
@@ -150,9 +184,13 @@ public class Render {
 	     
 	     frame.getContentPane().add(panelHelp,BorderLayout.EAST);
 	     frame.getContentPane().add(panelLeft,BorderLayout.CENTER);
+	      
+	     
 	     
 	     frame.pack();
 	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
+		  //  frame.setMinimumSize(new Dimension(765,frame.getHeight()));
+		  //  frame.setMaximumSize(new Dimension(1280,frame.getHeight()));
 	     
 	     
 	     
@@ -160,11 +198,65 @@ public class Render {
 	     
 	     frame.setVisible(true);
 	     this.renderMenu();
-
+	     enableOSXFullscreen(frame);
 	}
 	
 	
+	//Found here : https://gist.github.com/dohpaz42/4200907
+	@SuppressWarnings({"unchecked", "rawtypes"})
+    public static void enableOSXFullscreen(Window window) {
+        try {
+            Class util = Class.forName("com.apple.eawt.FullScreenUtilities");
+            Class params[] = new Class[]{Window.class, Boolean.TYPE};
+            Method method = util.getMethod("setWindowCanFullScreen", params);
+            method.invoke(util, window, true);
+        } catch (Exception e) {
+            FasT.getFasT().getLogger().warning("Could not enable fullscreen mode (maybe you are working on windows ?) ERROR : " + e.getMessage());
+        }
+    }
+	
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static void requestToggleFullScreen(Window window)
+    {
+        try {
+            Class appClass = Class.forName("com.apple.eawt.Application");
+            Class params[] = new Class[]{};
+
+            Method getApplication = appClass.getMethod("getApplication", params);
+            Object application = getApplication.invoke(appClass);
+            Method requestToggleFulLScreen = application.getClass().getMethod("requestToggleFullScreen", Window.class);
+
+            requestToggleFulLScreen.invoke(application, window);
+        } catch (Exception e) {
+        	 FasT.getFasT().getLogger().warning("Could not request fullscreen mode (maybe you are working on windows ?) ERROR : " + e.getMessage());
+        }
+    }
+	
+	
+public static KeyListener getSliderKeyListener()
+{
+	return new KeyListener()
+	{
+		boolean r=false;
+		@Override
+		public void keyTyped(KeyEvent e) {}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+			{
+				r=!r;
+				((JSlider) e.getSource()).setSnapToTicks(r);
+			}
+		}
+		@Override
+		public void keyReleased(KeyEvent e) {
+			/*if(e.getKeyCode()==KeyEvent.VK_SHIFT)
+			{
+				((JSlider) e.getSource()).setSnapToTicks(true);
+			}*/
+		}};
+}
 
 private void createMenuBar() {
 
@@ -267,14 +359,24 @@ private void renderMenu()
     
     JMenu spawn = new JMenu("spawn");
     JMenuItem ball = new JMenuItem("ball");
+    JMenuItem box = new JMenuItem("box");
+ 
     ball.addActionListener(new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			FasT.getFasT().getEntityHandler().spawn(new Ball(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),FasT.getFasT().getEntityHandler()));
 		}
     });
+    box.addActionListener(new ActionListener(){
+  		@Override
+  		public void actionPerformed(ActionEvent e) {
+  			FasT.getFasT().getEntityHandler().spawn(new Box(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),new Point(Mouse.getX()+20,Mouse.getY()+20).mouseToReal(),1,Liquid.WATER(),new C(new Angle(Math.PI),4),FasT.getFasT().getEntityHandler()));
+  		}
+      });
+      
     
     spawn.add(ball);
+    spawn.add(box);
     
     
     popupMenu.add(game);
@@ -299,7 +401,7 @@ private void renderMenu()
 		         if ( e.isPopupTrigger() )
 		         {
 		        	 Entity entity;
-		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),height-e.getY()).mouseToReal()))!=null && entity.shouldMenu(new Point(e.getX(),height-e.getY()).mouseToReal()))
+		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),glCanvas.getHeight()-e.getY()).mouseToReal()))!=null && entity.shouldMenu(new Point(e.getX(),glCanvas.getHeight()-e.getY()).mouseToReal()))
 		        	 {
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
 		        	 }
@@ -318,6 +420,12 @@ private void renderMenu()
 
 	public void resetGL()
 	{
+		try {
+			Display.setDisplayMode(new DisplayMode(Display.getParent().getWidth(),Display.getParent().getHeight()));
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		GL11.glMatrixMode(GL11.GL_PROJECTION);
         GL11.glLoadIdentity();
         GL11.glOrtho(-Display.getWidth()/2, Display.getWidth()/2,-Display.getHeight()/2,Display.getHeight()/2, -1.0, 1.0);
@@ -329,6 +437,7 @@ private void renderMenu()
 		
 
 	}
+	
 
 	public String getWindowTitle() {
 		return windowTitle;
@@ -357,13 +466,16 @@ private void renderMenu()
 	
 	public void StartRender() {
 
-		GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
+		if(flag)
+			this.resetGL();
+		flag=false;
+
+			GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_STENCIL_BUFFER_BIT);
 		 GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
 		 GL11.glClearColor(1.0F, 1.0F, 1.0F, 1.0F);
 		 
 		 GL11.glColor3d(0.0F, 0.0F, 0.0F);
 		 GL11.glPushMatrix();
-		
 		 GL11.glScaled(Normal.toPlan(1), Normal.toPlan(1), 1);
 		 GL11.glTranslated(Normal.rx, Normal.ry, 0);
 		// double zoom = 0.00001;
@@ -439,8 +551,43 @@ private void renderMenu()
 		GL11.glEnd(); 	
 	}
 
+	public void drawCorners(Point pos,double radius, float[] color) {
+		GL11.glColor3d(color[0], color[1], color[2]);
+		double d = radius/2;
+		
+		GL11.glBegin(GL11.GL_LINE_STRIP);
+		GL11.glVertex2d(pos.getX()-radius, pos.getY()+d);
+		GL11.glVertex2d(pos.getX()-radius, pos.getY()+radius);
+		GL11.glVertex2d(pos.getX()-d, pos.getY()+radius);
+		GL11.glEnd();
+		
+		GL11.glBegin(GL11.GL_LINE_STRIP);
+		GL11.glVertex2d(pos.getX()+radius, pos.getY()-d);
+		GL11.glVertex2d(pos.getX()+radius, pos.getY()-radius);
+		GL11.glVertex2d(pos.getX()+d, pos.getY()-radius);
+		GL11.glEnd();
+		
+		GL11.glBegin(GL11.GL_LINE_STRIP);
+		GL11.glVertex2d(pos.getX()-radius, pos.getY()-d);
+		GL11.glVertex2d(pos.getX()-radius, pos.getY()-radius);
+		GL11.glVertex2d(pos.getX()-d, pos.getY()-radius);
+		GL11.glEnd();
+		
+		GL11.glBegin(GL11.GL_LINE_STRIP);
+		GL11.glVertex2d(pos.getX()+radius, pos.getY()+d);
+		GL11.glVertex2d(pos.getX()+radius, pos.getY()+radius);
+		GL11.glVertex2d(pos.getX()+d, pos.getY()+radius);
+		GL11.glEnd();
+	}
+	
+	
 	/*
-	 * Here are folded unused part of code
+	
+
+ * 
+
+
+ * Here are folded unused part of code
 	 * 
 	 */
 
@@ -525,12 +672,22 @@ private void renderMenu()
      */
      
      
-
+	public boolean flag = false;
 	public void EndRender() {
 		GL11.glPopMatrix();
-
+		
 		Display.update();
+		
 	}
+
+	public void setFlag() {
+		
+		//set the flag to resize GL
+		this.flag=true;
+		
+	}
+
+	
 
 
 

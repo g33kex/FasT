@@ -51,7 +51,7 @@ class B extends A {
  
 	 */
 	private double radius; // m
-	private double masseVolumique = 3000; //7500 (acier) 20 (coton) 700 (acajou) kg/m^3
+	private double masseVolumique = 500;//3000; //7500 (acier) 20 (coton) 700 (acajou) kg/m^3
 	
 	public double getRadius()
 	{
@@ -109,9 +109,11 @@ class B extends A {
 	
 	JLabel bouncingLabel = new JLabel("bouncing");
 
+	JMenu tweak2 = new JMenu("tweak");
 	
-	private void addToPopupMenu()
+	protected void initPopupMenu()
 	{
+		//this.popupMenu.remove(tweak);
 		JSlider sliderRadius = new JSlider();
 		sliderRadius.setMinimum(10);
 		sliderRadius.setMaximum(400);
@@ -125,9 +127,9 @@ class B extends A {
 			}
 		});
 		slidermv.setMinimum(0);
-		slidermv.setMaximum(7500);
+		slidermv.setMaximum(3000);
 	//	slidermv.setMinorTickSpacing(50);
-		slidermv.setMajorTickSpacing(500);
+		slidermv.setMajorTickSpacing(50);
 		slidermv.setPaintTicks(true);
 		slidermv.setSnapToTicks(true);
 		slidermv.setValue((int)this.masseVolumique);
@@ -139,18 +141,19 @@ class B extends A {
 	
 				
 		
-		tweak.add(radiusLabel);
-		tweak.add(sliderRadius);
-		tweak.add(mvLabel);
-		tweak.add(slidermv);
-		tweak.add(bouncingLabel);
+		tweak2.add(radiusLabel);
+		tweak2.add(sliderRadius);
+		tweak2.add(mvLabel);
+		tweak2.add(slidermv);
+		tweak2.add(bouncingLabel);
 		
-		tweak.add(massLabel);
-		tweak.add(volumeLabel);
+		tweak2.add(massLabel);
+		tweak2.add(volumeLabel);
 
 		this.updateSizes();
 		//sliderRadius.setFocusable(false);
 		//slidermv.setFocusable(false);
+		slidermv.addKeyListener(Render.getSliderKeyListener());
 		slidermv.addKeyListener(new KeyListener()
 				{
 					boolean BOOST = false;
@@ -158,45 +161,25 @@ class B extends A {
 					public void keyTyped(KeyEvent e) {}
 					@Override
 					public void keyPressed(KeyEvent e) {
-						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
-						{
-								((JSlider) e.getSource()).setSnapToTicks(false);
-						}
-						else if(e.getKeyCode()==KeyEvent.VK_ALT)
+						if(e.getKeyCode()==KeyEvent.VK_ALT)
 						{
 							BOOST = ! BOOST;
-							((JSlider) e.getSource()).setMaximum(BOOST ? 750000000 : 7500);
-							((JSlider)e.getSource()).setValue(((JSlider)e.getSource()).getValue() * (BOOST ? 100000 : 1/100000));
-							((JSlider) e.getSource()).setMajorTickSpacing(BOOST ? 50000000 : 500);
+
+							((JSlider) e.getSource()).setMaximum(BOOST ? 1000000000 : 3000);
+							((JSlider)e.getSource()).setValue((int) (BOOST ? (((JSlider)e.getSource()).getValue()*1000000) :(((JSlider)e.getSource()).getValue()/((double)1000000))));
+							
+							((JSlider) e.getSource()).setMajorTickSpacing(BOOST ? 50000000 : 50);
 						}
 					}
 					@Override
 					public void keyReleased(KeyEvent e) {
-						if(e.getKeyCode()==KeyEvent.VK_SHIFT)
-						{
-							((JSlider) e.getSource()).setSnapToTicks(true);
-						}
+						
 					}});
-		sliderRadius.addKeyListener(new KeyListener()
-		{
-			@Override
-			public void keyTyped(KeyEvent e) {}
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
-				{
-						((JSlider) e.getSource()).setSnapToTicks(false);
-				}}
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if(e.getKeyCode()==KeyEvent.VK_SHIFT)
-				{
-					((JSlider) e.getSource()).setSnapToTicks(true);
-				}}});
+		sliderRadius.addKeyListener(Render.getSliderKeyListener());
 
-		
-		
-		popupMenu.updateUI();
+		this.popupMenu.add(tweak2);
+		this.popupMenu.pack();
+	//	popupMenu.updateUI();
 		/*tweak.addMenuKeyListener(new MenuKeyListener(){
 			@Override
 			public void menuKeyTyped(MenuKeyEvent e) {
@@ -230,8 +213,8 @@ class B extends A {
 		//this.velocity=new C(new Angle(Angle.convertToRad(90)),20).sum(new C(new Angle(Angle.convertToRad(0)),30));
 		//this.applyForce(new C(new Angle(Angle.convertToRad(35)),100000000));
 		this.positions.add(this.position);
-		this.velocity=new C(new Angle(Angle.convertToRad(90)),8.33);
-		this.addToPopupMenu();
+		//this.velocity=new C(new Angle(Angle.convertToRad(90)),8.33);
+		this.initPopupMenu();
 	}
 	
 	public Ball(Point position,double radius,EntityHandler entityHandler)
@@ -240,7 +223,7 @@ class B extends A {
 		this.radius=radius;
 		this.boundingBox = new BBCircle(this.position, radius);
 		this.setMV(1.9*Math.pow(10, 27));
-		this.addToPopupMenu();
+		this.initPopupMenu();
 	}
 
 	@Override
@@ -248,6 +231,10 @@ class B extends A {
 		float[] color = {(float) 0.8,(float) 0.1, (float) 0.3};
 		render.drawCircle(this.position,this.radius,color);	
 		render.drawLines(this.positions);
+		if(this.isSelected())
+		{
+			render.drawCorners(this.getPosition(),this.getRadius()+0.05,color);
+		}
 		//render.drawLine(this.getPosition(), new Point(this.getPosition().getX()+this.getVelocity().getRe(),this.getPosition().getY()+this.getVelocity().getIm()));
 	}
 	

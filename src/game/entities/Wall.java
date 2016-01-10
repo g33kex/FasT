@@ -31,7 +31,7 @@ public class Wall extends Entity {
 		render.drawLine(this.position,this.posMax);
 	}
 
-	public Object getAngle() {
+	public Angle getAngle() {
 		return this.angle;
 	}
 

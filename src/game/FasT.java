@@ -112,7 +112,7 @@ public class FasT {
 	private Point ballInit;
 	
 	
-	private UUID theBall;
+	public UUID theBall;
 	public UUID theBox = UUID.randomUUID();
 	
 	public FasT() throws LWJGLException {
@@ -131,12 +131,24 @@ public class FasT {
 	private void init() throws LWJGLException
 	{
 		render.init(this.width,this.height,this.title);
-		this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
+	//	this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
+		this.theBall = entityHandler.spawn(new Ball(new Point(-1,0),this.getEntityHandler()));
+		
+		//VELOCITYentityHandler.get(theBall).setVelocity(new C(0.5,0));
+		
+		//BALL2 entityHandler.spawn(new Ball(new Point(1,0),this.getEntityHandler()));
+		
 		//entityHandler.spawn(new Ball(new Point(40,500)));
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
+		
+		//WALLentityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(0),this.getEntityHandler()));
+		
+		entityHandler.spawn(new Box(new Point(-4,-3),new Point(4,-1),1,Liquid.WATER(), this.entityHandler));
+		
 		this.spawnWalls();
-		entityHandler.spawn(new Box(new Point(1,1),new Point(2,2),1,Liquid.WATER, this.entityHandler));
+		
+		
 		render.updateLabels();
 	}
 	
@@ -144,7 +156,9 @@ public class FasT {
 	{
 		entityHandler.destroy(this.theBox);
 	//	this.theBox=entityHandler.spawn(new Box(new Point(-this.width/2,-this.height/2).toReal(), new Point(this.width/2,this.height/2).toReal(),4,this.entityHandler));
-		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,Liquid.AIR, this.entityHandler));
+		
+		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,Liquid.AIR(), this.entityHandler),true);
+		
 		/*entityHandler.clear("wall");
 		entityHandler.spawn(new Wall(new Point(0,0).toReal(),Normal.toReal(this.width),new Angle(0),this.entityHandler));
 		entityHandler.spawn(new Wall(new Point(1,0).toReal(),Normal.toReal(this.height),new Angle(Math.PI/2),this.entityHandler));
@@ -310,6 +324,11 @@ public class FasT {
 			{
 				  GL11.glOrtho(5, 0,5,0, -1.0, 1.0);
 			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_F)
+			{
+			     this.getRender();
+				Render.requestToggleFullScreen(this.getRender().getFrame());
+			}
 		}
 	}
 	
@@ -372,24 +391,57 @@ public class FasT {
 				}
 			}
 			
+			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT) && !Keyboard.isKeyDown(Keyboard.KEY_RMENU))
+			{
+				Normal.x+=Mouse.getEventDX();
+				Normal.rx=Normal.toReal(Normal.x);
+				Normal.y+=Mouse.getEventDY();
+				Normal.ry=Normal.toReal(Normal.y);
+				this.spawnWalls();
+				continue;
+			}
+			
 			//Handeling home made drag events
-			if(!Mouse.isButtonDown(0))
+			if(!Mouse.isButtonDown(0) || Keyboard.isKeyDown(Keyboard.KEY_RMENU))
 			{
 				for(Entity entity : this.entityHandler.getEntities()) {
 					entity.setBeingDragged(false, new Point(Mouse.getEventDX(),Mouse.getEventDY()).mouseToReal());
 				}
 			}
 			
-			
+			boolean r = false;
 			if(Mouse.getEventButtonState() && Mouse.getEventButton()==0)
 			{	
 				Entity e;
 				if(( e = entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal())) != null)
 				{
-						e.setBeingDragged(true, new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal());
+						if(Keyboard.isKeyDown(Keyboard.KEY_RMENU))
+						{
+						if(!Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
+						{
+							for(Entity l : this.entityHandler.getEntities())
+							{
+								if(l!=e)	
+									l.setSelected(false);
+							}
+						}
+						e.setSelected(!e.isSelected());
+						r=true;
+						}
+						else
+						{
+							e.setBeingDragged(true, new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal());
+						}
+				}
+				else if(!Keyboard.isKeyDown(Keyboard.KEY_RSHIFT) && Keyboard.isKeyDown(Keyboard.KEY_RMENU))
+				{
+					for(Entity l : this.entityHandler.getEntities())
+					{
+						l.setSelected(false);
+					}
 				}
 			}
-			boolean r = false;
+
 			for(Entity b : this.entityHandler.getEntities())
 			{
 				if(b.getBeingDragged())
@@ -399,22 +451,15 @@ public class FasT {
 				}
 			}
 			
-			if(r)
-				continue;
+		//	if(r)
+		//		continue;
 			
 			/*Entity entityd;
 			if(!((entityd = this.getEntityHandler().getEntityUnder(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())) != null && entityd.hoover(new Point(Mouse.getX(),Mouse.getY()).mouseToReal())))
 				this.getRender().getCanvas().setCursor(java.awt.Cursor.getDefaultCursor());*/
 			
 			//Handle moving panel when draging with shift enabled
-			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))
-			{
-				Normal.x+=Mouse.getEventDX();
-				Normal.rx=Normal.toReal(Normal.x);
-				Normal.y+=Mouse.getEventDY();
-				Normal.ry=Normal.toReal(Normal.y);
-				this.spawnWalls();
-			}
+		
 			
 			
 			/*if(Mouse.getEventButton()==1 && Mouse.getEventButtonState())
@@ -462,6 +507,27 @@ public class FasT {
 	//Render entities and everything
 	public void render()
 	{
+		boolean b = true;
+		for(Entity entity : this.getEntityHandler().getEntities())
+		{
+			if(entity.isSelected())
+			{
+				if(!this.getRender().BPanel.isVisible())
+				{
+					this.getRender().BPanel.setVisible(true);
+					this.getRender().panel.updateUI();
+					this.getRender().setFlag();
+				}
+				b=false;
+			}
+		}
+		if(b && this.getRender().BPanel.isVisible())
+		{
+			this.getRender().BPanel.setVisible(false);
+			this.getRender().panel.updateUI();
+			this.getRender().setFlag();
+		}
+		
 		render.StartRender();
 		
 	//	render.drawSquare(new physics.maths.Point(20,20), new physics.maths.Point(200,200)); //Just a little square test

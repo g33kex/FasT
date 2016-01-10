@@ -1,5 +1,6 @@
 package physics;
 
+import physics.maths.Angle;
 import physics.maths.C;
 import physics.maths.Point;
 
@@ -33,8 +34,8 @@ public abstract class BB {
 	}
 	
 
-	public static boolean collisionBallWall(Point position, double radius, Point position2, Object angle) {
-		return false;
+	public static boolean collisionBallWall(Point position, double radius, Point position2, Angle angle) {
+		return position.getY()-radius<=position2.getY();
 	}
 
 	public static boolean collisionBallSquare(Point position, double radius, Point position2, Point max) {

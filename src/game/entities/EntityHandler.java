@@ -20,6 +20,27 @@ public class EntityHandler {
 	
 	public UUID spawn(Entity e)
 	{
+		if(e instanceof Ball)
+		{
+			this.entities.add(0, e);
+		}
+		else
+		{
+			this.entities.remove(alwaysTop);
+			this.entities.add(e);
+			if(alwaysTop!=null)
+			this.entities.add(alwaysTop);
+		}
+		return e.getUUID();
+	}
+	
+	private Entity alwaysTop;
+	public UUID spawn(Entity e,boolean shouldAlwaysTop)
+	{
+		if(shouldAlwaysTop)
+		{
+			alwaysTop=e;
+		}
 		this.entities.add(e);
 		return e.getUUID();
 	}

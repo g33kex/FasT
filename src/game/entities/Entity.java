@@ -47,14 +47,18 @@ public abstract class Entity
 	
 	
 	private boolean isBeingDragged = false;
+	private boolean isSelected = false;
 	
-	protected final JPopupMenu popupMenu = new JPopupMenu();
+	protected JPopupMenu popupMenu = new JPopupMenu();
 	
 	public JPopupMenu getPopupMenu() { return this.popupMenu;}
-	protected JMenu tweak = new JMenu("tweak");
+	//protected JMenu tweak = new JMenu("tweak");
+	protected JMenu options = new JMenu("options");
 	
 	protected JLabel speedLabel = new JLabel();
 	protected JLabel ecLabel = new JLabel();
+	
+	protected void initPopupMenu(){};
 	
 	protected final void createPopupMenu()
 	{
@@ -67,7 +71,7 @@ public abstract class Entity
 		});
 		
 
-		this.popupMenu.add(tweak);
+		this.popupMenu.add(options);
 		this.popupMenu.add(speedLabel);
 		this.popupMenu.add(ecLabel);
 		this.popupMenu.add(delete);
@@ -210,6 +214,17 @@ public abstract class Entity
 	}
 
 	public boolean shouldMenu(Point p){return false;}
+
+	public boolean isSelected() {
+		return isSelected;
+	}
+
+	public boolean setSelected(boolean isSelected) {
+		if(!(this instanceof Ball))
+			return false;
+		this.isSelected = isSelected;
+		return true;
+	}
 
 
 
