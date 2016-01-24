@@ -22,7 +22,7 @@ public class Physics {
 	public boolean GROUND = false;
 	
 	
-	public int simulationLevel = SimulationLevel.CHUTE_FRICTION; // -1 = Nothing 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
+	public int simulationLevel = SimulationLevel.NOTHING; // -1 = Nothing 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
 	
 	private class SimulationLevel
 	{
@@ -33,8 +33,7 @@ public class Physics {
 		public static final int CHUTE_FRICTION=3;
 	}
 	
-	
-	public Physics()
+	Physics()
 	{
 	//	g=6; FALLING ON THE MOON
 	}
@@ -70,19 +69,27 @@ public class Physics {
 		{
 			
 			C velocity1 = entity.getVelocity();
-			C velocity2 = entityC.getVelocity();
+			C velocity2 = new C();//;entityC.getVelocity();
 			
 			double v1 = velocity1.getRho();
 			double v2 = velocity2.getRho();
 			
+			//NV = V-P-PI/2 => V = NV+P+PI/2
+			C P1 = new C(entityC.getPosition().getX()-entity.getPosition().getX(),entityC.getPosition().getY()-entity.getPosition().getY());
 			
-			double t1 = velocity1.getTheta().getRad();
-			double t2 = velocity2.getTheta().getRad();
+			//C T1 = velocity1.substracte(P1).substracte(Math.PI/2);
+			double o1 = velocity1.getTheta().getRad()-P1.getTheta().getRad()-(Math.PI/2);
 			
-			double ab = Math.atan((entity.getPosition().getY()-entityC.getPosition().getY())/(entity.getPosition().getX()-entityC.getPosition().getX()));
+			//double o1 = T1.getTheta().getRad();
+			
+			
+		//	double t1 = velocity1.getTheta().getRad();
+		//	double t2 = velocity2.getTheta().getRad();
+			
+		//	double ab = Math.atan((entity.getPosition().getY()-entityC.getPosition().getY())/(entity.getPosition().getX()-entityC.getPosition().getX()));
 			//double a = ab-(Math.PI/2);
 			
-			double o1 = ab+t1-(Math.PI/2);
+		//	double o1 = ab+t1-(Math.PI/2);
 		//	double o2 = a-t2;
 			
 					
@@ -94,15 +101,22 @@ public class Physics {
 			double O1 = 0;
 			double O2 = 0;
 			
-			if(entityC.getVelocity().getRho()==0)
+			if(true);//entityC.getVelocity().getRho()==0)
 			{
 				O1 = Math.atan(((m1-m2)/(m1+m2))*Math.tan(o1));
-
 				V1 = Math.sqrt(Math.pow(((m1-m2)/(m1+m2)*v1*Math.sin(o1)), 2)+Math.pow(v1*Math.cos(o1), 2));
 				
-				FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|o1="+o1+"|O1="+O1);
-				entity.setVelocity(new C(new Angle(O1),v1));
-				entityC.setVelocity(new C(new Angle(O2),V2));
+				//C V1a = new C(new Angle(O1),V1);
+				
+				//C V1b = V1a.sum(P1).sum(Math.PI/2);
+				
+				C V1b = new C(new Angle(V1+P1.getTheta().getRad()+(Math.PI/2)),V1);
+				
+				FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|o1="+o1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
+				entity.setVelocity(V1b);
+				//entity.setVelocity(new C(new Angle(O1),v1));
+			//	entityC.setVelocity(new C(new Angle(O2),V2));
+				
 			//	entity.setPosition(entity.positions.get(entity.positions.size()-2));
 				//entity.setVelocity(new C(entity.getVelocity().getRe(),-entity.getVelocity().getIm()));
 			}

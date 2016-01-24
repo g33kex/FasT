@@ -86,6 +86,21 @@ public class C {
 		return(this.sum(this,c2));
 	}
 	
+	public C substracte(C c2)
+	{
+		return(this.sum(this,c2.product(-1))); 
+	}
+	
+	public C substracte(double real)
+	{
+		return(this.sum(this, -real));
+	}
+	
+	public C sum(double real)
+	{
+		return(this.sum(this,real));
+	}
+	
 	public C product(C c2)
 	{
 		return(this.product(this,c2));
@@ -110,6 +125,17 @@ public class C {
 	private C sum(C c1,C c2)
 	{
 		return(new C(c1.re+c2.re,c1.im+c2.im));
+	}
+	
+	private C sum(C c1,double real)
+	{
+	//	return(new C(c1.re+real,c1.im));
+		return(new C(new Angle(this.theta.getRad()+real),this.rho));
+	}
+
+	private String toStringAng(C c1,boolean rad)
+	{
+		return c1.rho + "*(cos " + (rad ? c1.theta.toString():c1.theta.toStringDeg()) + "+i*sin "+ (rad ? c1.theta.toString():c1.theta.toStringDeg()) +")";
 	}
 	
 	private C product(C c1, double real)
@@ -166,10 +192,6 @@ public class C {
 		return c1.re + "";
 	}
 	
-	private String toStringAng(C c1,boolean rad)
-	{
-		return c1.rho + "*(cos " + (rad ? c1.theta.toString():c1.theta.toStringDeg()) + "+i*sin "+ (rad ? c1.theta.toString():c1.theta.toStringDeg()) +")";
-	}
 	
 	/*public C ToXY() 
 	{
