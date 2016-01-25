@@ -33,7 +33,7 @@ public class Physics {
 		public static final int CHUTE_FRICTION=3;
 	}
 	
-	Physics()
+	public Physics()
 	{
 	//	g=6; FALLING ON THE MOON
 	}
