@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.0.3.2 (MacOSX)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="2016-02-19T14:46:49.032471000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2016-01-31T11:29:15.138250000">
+	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2016-01-24T21:46:14.793472000">
+	<meta name="created" content="00:00:00">
+	<meta name="changed" content="2016-01-11T17:53:19.335211000">
+	<meta name="created" content="2016-01-11T17:14:16.867325000">
+	<style type="text/css">
+		p { margin-bottom: 0.04cm; line-height: 150% }
+	</style>
+</head>
+<body lang="fr-FR" dir="ltr">
+<p style="line-height: 100%">Ce document a pour but de vous apprendre
+à utiliser ce logiciel, FasT (Fast algorithm for SimulaTions), et à
+exploiter pleinement les fonctionnalités de ce programme. Il est
+fortement conseillé de lire intégralement ce document avant de
+commencer à utiliser le logiciel. Ce logiciel est proposé dans le
+cadre du TPE de 1<sup>ère </sup>S. Merci de vous référer à la
+page d'introduction. En utilisant ce logiciel, vous reconnaissez
+accepter le <a href="License.html">contrat de licence</a>.</p>
+<hr/>
+
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><font color="#ff3399"><font size="5" style="font-size: 18pt"><u><b>Utilisation
+de FasT</b></u></font></font></p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><b>0. Introduction</b></p>
+<p style="line-height: 100%">FasT (FasT Algorithm for SimulaTions)
+est un logiciel permettant de simuler des phénomènes physiques tels
+que des chutes dans différents fluides et des collisions. Il utilise
+une gestion d'objets dynamique, il est donc capable de réagir au
+entrées souris et clavier de l'utilisateur en temps réel.
+L'utilisateur peut par exemple modifier la vitesse d'une balle au
+cours d'une simulation, sans dégrader la précision du résultat
+final. 
+</p>
+<p style="line-height: 100%">Ce logiciel est entièrement Open Source
+(Code source disponible sur GitHub à l'adresse suivante&nbsp;:
+<a href="https://www.github.com/tourdetour/FasT">https://www.github.com/tourdetour/FasT</a>),
+distribué sous licence GNU General Public License. Veuillez vous
+référer au contrat de licence. 
+</p>
+<p style="line-height: 100%">Il a été développé collectivement
+par les membres de ce TPE et le code source appartient à *******
+******* (Nom réel masqué dans ce tutoriel pour des raisons de
+sécurité), alias Tourdetour. Il est écrit en Java et les
+explications et tutoriels sont écrits en HTML. 
+</p>
+<p style="line-height: 100%">Ce logiciel, contenant plus de 5000
+lignes de code (Se référer à la page GitHub pour le nombre exact),
+ainsi que les explications qui y sont attachées constituent la
+production de ce TPE. Vous êtes en train de lire la notice
+d'utilisation papier de cette production, disponible également en
+format numérique.</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><b>I. Utilisation générale</b></p>
+<p style="line-height: 100%"><u>0. Généralités</u></p>
+<p style="line-height: 100%; text-decoration: none">La fenêtre de
+FasT se compose de deux parties. La première partie, en blanc par
+défaut, contient le simulateur. Son utilisation est expliquée
+ci-après. 
+</p>
+<p style="line-height: 100%"><span style="text-decoration: none">La
+deuxième partie contient un navigateur intranet qui permet de lire
+des fichiers html stockés dans l'application. Il contient les
+explications théoriques et mathématiques nécessaires à la
+réalisation du simulateur, ainsi que cette présente notice
+d'utilisation. Ce navigateur s'utilise de la même manière qu'un
+navigateur web, utilisez la molette de la souris pour faire défiler
+une page et cliquez sur les liens hyper-textes pour accéder aux
+différentes parties des explications théoriques </span><font color="#ff3333"><span style="text-decoration: none">(qui
+sont une partie intégrante de ce TPE)</span></font><font color="#000000"><span style="text-decoration: none">.
+Utilisez le bouton «&nbsp;home&nbsp;» symbolisé par un pictogramme
+de maison pour revenir à la page principale. Les flèches «&nbsp;droite&nbsp;»
+et «&nbsp;gauche&nbsp;» situées à gauche du bouton «&nbsp;home&nbsp;»,
+permettent respectivement de revenir d'une page en arrière ou
+d'avancer d'une page en avant, à la manière des flèches de
+nagivation d'un navigateur web usuel. </span></font>
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><u>1.Manipuler le monde</u></p>
+<p style="line-height: 100%">Le monde est défini par la zone où les
+objets expérimentaux peuvent se déplacer. Ce monde est infini et a
+une origine (0,0) située au centre de la première partie de la
+fenêtre au démarrage du programme. En bas à gauche se trouve un
+trait bleu indiquant l'échelle, il correspond à 1 mètre dans la
+réalité. 
+</p>
+<p style="line-height: 100%">Toutes les manipulations suivantes
+doivent être réalisées alors que la fenêtre principale «&nbsp;FasT&nbsp;»
+est sélectionnée et que <font color="#ff3333">le pointeur de la
+souris est dans la partie simulation de la fenêtre</font>. 
+</p>
+<p style="line-height: 100%">•Pour se déplacer dans le monde,
+maintenez la touche <font color="#ff3333">Majuscule droite</font>,
+maintenez le <font color="#ff3333">clic gauche</font> et <font color="#ff3333">faites
+glisser</font> le pointeur de la souris. La caméra se déplace alors
+dans le sens inverse du déplacement du pointeur de la souris.</p>
+<p style="line-height: 100%">•Pour effectuer un zoom avant ou
+arrière, utilisez la<font color="#ff3333"> molette</font> de la
+souris. Le centre du zoom est l'emplacement courant de la souris. 
+</p>
+<p style="line-height: 100%">•Le <font color="#ff3333">clic droit</font>
+permet d'afficher le menu contextuel.</p>
+<p style="line-height: 100%">•Effectuez un <font color="#ff3333">clic
+droit</font> dans une zone vide (sans objet sous le pointeur de la
+souris) et naviguez sous <font color="#ff3333">«&nbsp;file&nbsp;»</font>
+dans ce menu puis cliquez sur&nbsp;:</p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#000000">-
+</font><font color="#ff3333">«&nbsp;exit&nbsp;»</font> pour quitter
+FasT (Vous pouvez également cliquer sur la croix rouge en haut à
+droite de la fenêtre ou appuyer sur la touche <font color="#ff3333">«&nbsp;échap&nbsp;»</font>)</p>
+<p style="margin-left: 2cm; line-height: 100%">- <font color="#ff3333">«&nbsp;about&nbsp;»</font>
+pour avoir des information sur FasT (telles que le numéro de
+version).</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><u>2.Manipuler les objets</u></p>
+<p style="line-height: 100%">Le programme permet de faire évoluer
+plusieurs types d'objets dans le monde pour qu'ils puissent interagir
+entre eux et avec l'environnement. Ils composent le système étudié.
+</p>
+<p style="line-height: 100%"><span style="font-variant: normal"><span style="font-style: normal"><u><span style="font-weight: normal">A</span></u></span></span>.
+Pour faire apparaître un objet, effectuez un <font color="#ff3333">clic
+droit</font> dans une zone vide (sans objet sous le pointeur de la
+souris) puis naviguez dans le menu contextuel jusqu’à <font color="#ff3333">“spawn”</font>
+puis cliquez sur l'objet désiré. Il apparaîtra sous le pointeur de
+la souris. Vous pouvez faire apparaître deux types d'objets&nbsp;:</p>
+<p style="margin-left: 2cm; line-height: 100%; text-decoration: none">
+<span style="font-variant: normal"><span style="font-style: normal"><b>a)</b></span></span>
+<i>Les balles (ball)</i></p>
+<p style="margin-left: 2cm; line-height: 100%">Les balles sont les
+objets étudiés. Elles sont définies par un rayon, une masse
+volumique, et possèdent une vitesse. Elles sont soumises aux forces
+appliquées par l'environnement et sont également capables
+d'interagir avec d'autres balles. 
+</p>
+<p style="margin-left: 2cm; line-height: 100%">•Pour changer les
+propriétés d'une balle, effectuez un <font color="#ff3333">clic
+droit</font> avec <font color="#ff3333">le pointeur de la souris
+situé sur la balle</font> (le pointeur change de forme et devient
+une main).</p>
+<p style="margin-left: 2cm; line-height: 100%">Le menu contextuel qui
+apparaît vous permet&nbsp;:</p>
+<p style="margin-left: 4cm; line-height: 100%">-De voir la <font color="#ff3333">vitesse</font>
+de la balle<font color="#ff3333"> (speed)</font></p>
+<p style="margin-left: 4cm; line-height: 100%">-De voir <font color="#ff3333">l'énergie
+cinétique</font> de la balle <font color="#ff3333">(Ec)</font></p>
+<p style="margin-left: 2cm; line-height: 100%">Dans le menu, naviguez
+sous <font color="#ff3333">«&nbsp;tweak&nbsp;»</font><font color="#000000">.
+Vous pouvez alors modifier les paramètres de la balle&nbsp;:</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;Radius&nbsp;»</font><font color="#000000">
+pour modifier le </font><font color="#ff3333">rayon</font><font color="#000000">
+de la balle</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;m/V&nbsp;»</font><font color="#000000">
+pour modifier la </font><font color="#ff3333">masse volumique</font><font color="#000000">
+de la balle</font></p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#000000"><span style="text-decoration: none">•</span></font><font color="#000000">Pour
+déplacer une balle, maintenez le </font><font color="#ff3333">clic
+gauche</font><font color="#000000"> sur la balle et </font><font color="#ff3333">glissez</font><font color="#000000">
+le pointeur de la souris. La balle suit les déplacements du pointeur
+de la souris jusqu’à ce que vous relâchiez le clic gauche. </font>
+</p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#000000">Si
+vous lâchez le clic gauche alors que le pointeur de la souris est
+encore en mouvement, la balle acquerra une vitesse proportionnelle à
+la vitesse du pointeur de la souris. Ces déplacement fonctionnent
+également lorsque la simulation est en marche. Vous pouvez donc
+interagir dynamiquement avec les balles de l'environnement. </font>
+</p>
+<p style="margin-left: 2cm; line-height: 100%"><b>b)</b> <i>Les
+boîtes (box)</i></p>
+<p style="margin-left: 2cm; line-height: 100%">Les boîtes sont des
+objets non soumis aux forces extérieures (fixes). Elles peuvent
+contenir différents fluides, possèdent une paroi et permettent donc
+de simuler des chutes dans des fluides. On considère chaque boîte
+comme une zone d'expérimentation à part. 
+</p>
+<p style="margin-left: 2cm; line-height: 100%">•Pour changer les
+propriétés d'une boîte, effectuez un <font color="#ff3333">clic
+droit</font> avec <font color="#ff3333">le pointeur de la souris
+situé dans le coin inférieur gauche de la boîte</font> (le
+pointeur change de forme et devient une main).</p>
+<p style="margin-left: 2cm; line-height: 100%">Dans le menu, naviguez
+sous <font color="#ff3333">«&nbsp;tweak&nbsp;»</font><font color="#000000">.
+Vous pouvez alors modifier les paramètres de la boîte&nbsp;:</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;masse
+volumique&nbsp;»</font><font color="#000000"> pour modifier la </font><font color="#ff3333">masse
+volumique</font><font color="#000000"> du liquide contenu dans la
+boîte</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;Viscosite&nbsp;»</font><font color="#000000">
+pour modifier la </font><font color="#ff3333">viscosité</font><font color="#000000">
+du liquide contenu dans la boîte</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;fill&nbsp;»</font><font color="#000000">
+pour modifier le </font><font color="#ff3333">pourcentage de
+remplissage</font><font color="#000000"> en liquide de la boîte</font></p>
+<p style="margin-left: 4cm; line-height: 100%"><font color="#000000">-Faites
+glisser le curseur </font><font color="#ff3333">«&nbsp;gravite&nbsp;»</font><font color="#000000">
+pour modifier la </font><font color="#ff3333">force de pesanteur g</font><font color="#000000">
+qui s'exerce à l'intérieur de la boîte (En cours de construction.
+Cela permet de faire de jolis effets de zones anti-gravité). </font>
+</p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#000000">•Pour
+déplacer une boîte, maintenez le </font><font color="#ff3333">clic
+gauche</font><font color="#000000"> dans le </font><font color="#ff3333">coin
+inférieur gauche</font><font color="#000000"> de la boîte et
+</font><font color="#ff3333">glissez</font><font color="#000000"> le
+pointeur de la souris. La boîte suit les déplacements du pointeur
+de la souris jusqu’à ce que vous relâchiez le clic gauche. </font>
+</p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#000000">•Pour
+redimensionner une boîte, maintenez le </font><font color="#ff3333">clic
+gauche</font><font color="#000000"> dans le </font><font color="#ff3333">coin
+supérieur droit</font><font color="#000000"> de la boîte (le
+curseur de la souris prend la forme d'une flèche orientée en haut à
+gauche) et </font><font color="#ff3333">glissez</font><font color="#000000">
+le pointeur de la souris. Le coin supérieur gauche de la boîte suit
+les déplacement du pointeur de la souris jusqu’à ce que vous
+relâchiez le clic gauche. Vous ne pouvez pas redimensionner la boîte
+en dessous d'une certaine taille, relative au niveau de zoom. </font>
+</p>
+<p style="margin-left: 2cm; line-height: 100%"><font color="#800000">Note</font>&nbsp;:
+La fenêtre de simulation est elle même une boîte. En effectuant un
+<font color="#ff3333">clic droit</font> dans une zone vide (sans
+objets sous le pointeur de la souris), et en navigant dans le menu
+sous <font color="#ff3333">«&nbsp;game&nbsp;»</font> puis sous
+<font color="#ff3333">«&nbsp;liquid&nbsp;»</font>, vous pouvez
+modifier de la même manière les propriétés de la boîte
+principale de la fenêtre de simulation (qui contient de l'air par
+défaut).</p>
+<p style="line-height: 100%"><u>B</u>. Pour supprimer un objet,
+affichez son menu contextuel en effectuant un <font color="#ff3333">clic
+droit</font> avec <font color="#ff3333">le pointeur de la souris
+situé sur l'objet</font> et appuyez sur <font color="#ff3333">«&nbsp;delete&nbsp;»</font>.
+Vous pouvez ainsi supprimer des balles et des boîtes. 
+</p>
+<p style="line-height: 100%"><u>C</u>. Précisions sur les curseurs&nbsp;:
+</p>
+<p style="margin-left: 2cm; line-height: 100%">-Lorsqu'un curseur est
+sélectionné, appuyez sur la touche <font color="#ff3333">Majuscule
+droite</font> pour activer ou désactiver le défilement de
+précision.</p>
+<p style="margin-left: 2cm; line-height: 100%">-Lorsque le curseur
+«&nbsp;m/V&nbsp;» servant à modifier la masse volumique est
+sélectionné, appuyez sur la touche <font color="#ff3333">Alt droite</font>
+pour activer ou désactiver un facteur multiplicateur x3.33*10^5 sur
+la valeur du curseur. (Utile dans le mode Univers pour avoir des
+objets avec une très grande différence de masse)</p>
+<p style="margin-left: 2cm; line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><u>3.Méthodes d'analytique</u></p>
+<p style="line-height: 100%">Cette section est en construction. 
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><b>II. Démarrer la simulation</b></p>
+<p style="line-height: 100%">Effectuez un <font color="#ff3333">clic
+droit</font> dans une zone vide (sans objet sous le pointeur de la
+souris) et naviguez sous <font color="#ff3333">«&nbsp;game&nbsp;»</font>.
+Vous pouvez&nbsp;: 
+</p>
+<p style="margin-left: 2cm; line-height: 100%">-Choisir le type de
+simulation désirée (décrites ci-dessous) en cliquant sur <font color="#ff3333">«&nbsp;sans
+forces&nbsp;»</font>, <font color="#ff3333">«&nbsp;chute libre&nbsp;»</font>,
+<font color="#ff3333">«&nbsp;chute avec frottements&nbsp;»</font>
+ou <font color="#ff3333">«&nbsp;Univers&nbsp;»</font>.</p>
+<p style="margin-left: 2cm; line-height: 100%">-Activer ou désactiver
+la gestion des collisions en cliquant sur <font color="#ff3333">«&nbsp;rebonds&nbsp;»</font>.
+</p>
+<p style="margin-left: 2cm; line-height: 100%">-Démarrer ou arrêter
+la simulation en cliquant sur <font color="#ff3333">«&nbsp;play&nbsp;»</font>
+et <font color="#ff3333">«&nbsp;pause&nbsp;»</font> (Vous pouvez
+aussi appuyer sur la touche <font color="#ff3333">«&nbsp;espace&nbsp;»</font>).</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%">1.Sans forces</p>
+<p style="margin-left: 2cm; line-height: 100%">Si vous avez
+sélectionné une simulation <font color="#ff3333">«&nbsp;sans
+forces&nbsp;»</font> , toutes les balles (auxquelles vous pouvez
+donner une vitesse initiale) auront un mouvement rectiligne et
+uniforme (hors collisions). Il n'y a donc pas de forces d'interaction
+gravitationnelle, de champ de pesanteur, ni de forces de frottement. 
+</p>
+<p style="line-height: 100%">2.Chute libre</p>
+<p style="margin-left: 2cm; line-height: 100%">Si vous avez
+sélectionné une simulation en <font color="#ff3333">«&nbsp;chute
+libre&nbsp;»</font>, toutes les balles (auxquelles vous pouvez
+donner une vitesse initiale) seront soumises à leur poids, c'est à
+dire au champ de pesanteur. On néglige ici toutes forces de
+frottements et toutes interactions avec d'autres objets (hors
+collisions). 
+</p>
+<p style="line-height: 100%">3.Chute avec frottements (dans un
+fluide)</p>
+<p style="margin-left: 2cm; line-height: 100%">Si vous avez
+sélectionné une simulation de <font color="#ff3333">«&nbsp;chute
+avec frottements&nbsp;»</font> , toutes les balles (auxquelles vous
+pouvez donner une vitesse initiale) seront soumises à leur poids,
+c'est à dire au champ de pesanteur. Elles seront également soumises
+à la poussée d'Archimède lorsqu'elles se trouvent dans un fluide,
+ainsi qu'aux forces de frottements exercées par ce fluide. On
+considère que le milieu d'expérimentation principal est rempli
+d'air. Pour effectuer des chutes dans d'autre liquides, se référer
+au chapitre sur les boîtes. 
+</p>
+<p style="line-height: 100%"><font color="#800000">Note</font>&nbsp;:
+La zone d'expérimentation principale désigne la zone actuellement
+visible dans la fenêtre de simulation. On peut distinguer deux modes
+de fonctionnements&nbsp;:</p>
+<p style="margin-left: 2cm; line-height: 100%">-Le premier, par
+défaut, n'applique plus aucune forces sur la balle lorsqu'elle n'est
+plus visible à l'écran, c'est à dire lorsqu'elle sort de la zone
+d'expérimentation principale. Cela permet de sauvegarder des
+ressources processeur.</p>
+<p style="margin-left: 2cm; line-height: 100%">-Le second, que vous
+pouvez activer en effectuant un clic droit dans une zone vide, et en
+navigant sous <font color="#ff3333">«&nbsp;game&nbsp;»</font>, puis
+<font color="#ff3333">«&nbsp;liquide&nbsp;»</font> et en cochant
+<font color="#ff3333">«&nbsp;apply everywhere&nbsp;»</font><font color="#000000">,
+applique les forces de frottements et de pesanteur quel que soit la
+position de l'objet dans le monde. Cela permet par exemple de suivre
+une balle lors d'une chute plus haute que la taille de l'écran. </font>
+</p>
+<p style="line-height: 100%">4.Simulation à l'échelle de l'Univers</p>
+<p style="margin-left: 2cm; line-height: 100%">Si vous avez
+sélectionné une simulation de type <font color="#ff3333">«&nbsp;univers&nbsp;»</font>,
+toutes les balles (auxquelles vous pouvez donner une vitesse
+initiale) ne seront pas soumies à un champ de pesanteur ni aux
+forces de frottements des fluides. Elles seront cependant en
+interaction constante entre elles, en fonction de leur masse, selon
+la loi universelle de la gravitation. Il est conseillé d'utiliser
+des balles avec une masse très élevé. Se référer au chapitre sur
+les balles pour apprendre à modifier la masse volumique d'une balle.
+</p>
+<p style="margin-left: 2cm; line-height: 100%">Ce mode de simulation
+peut permettre par exemple de modéliser le mouvement des planètes
+du système solaire. Les balles peuvent donc s'attirer entre elles et
+même entrer en orbite si elles ont une vitesse et une trajectoire
+adéquate. 
+</p>
+<p style="line-height: 100%">5.Gestion des collisions (rebonds)</p>
+<p style="margin-left: 2cm; line-height: 100%">Si vous avez coché la
+gestion des <font color="#ff3333">«&nbsp;rebonds&nbsp;»</font>, les
+balles vont pouvoir interagir entre elles et avec leur environnement
+lors des collisions. 
+</p>
+<p style="margin-left: 2cm; line-height: 100%">Les balles en
+mouvement peuvent interagir avec d'autre balles en mouvement, ainsi
+qu'avec des balles fixes. Les balles peuvent également entrer en
+collision avec les murs des boîtes, ainsi qu'avec les bords de la
+fenêtre. 
+</p>
+<p style="margin-left: 2cm; line-height: 100%">Pour l'instant, on
+considère que toutes les collisions sont élastiques, donc sans
+aucune perte d'énergie et sans déformation. 
+</p>
+<p style="line-height: 100%">Il reste quelques imprécisions lors de
+la détection des collisions, ils se peut que la détection se fasse
+trop tard et qu'une balle en traverse une autre, ce qui peut donner
+des résultats surprenants. 
+</p>
+<p style="line-height: 100%"><font color="#800000">Note</font>&nbsp;:
+Si la gestion des rebonds n'est pas activée, les balles peuvent
+traverser les murs et se traverser entre elles. 
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%">C'est la fin de ce tutoriel. N'hésitez
+pas à vous familiariser avec le logiciel et si vous avez des
+questions, contactez nous à l'adresse email suivante&nbsp;:
+TPEFasT@mail.com</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p style="line-height: 100%"><br/>
+<br/>
+
+</p>
+<p><meta name="changed" content="00:00:00"></p>
+</body>
+</html>
