@@ -21,9 +21,19 @@
 
 package log;
 
+import java.util.ArrayList;
+
+import game.Color;
+import game.FasT;
+import physics.maths.Angle;
+import physics.maths.C;
+import physics.maths.Point;
+
 public class Logger {
 	
 	private int level=0;
+	
+	public boolean shallLog = true;
 	
 	//Log levels : 0 = all; 1 = info, warning, error; 2 = warning, error; 3 = error
 	public Logger(int level)
@@ -63,6 +73,8 @@ public class Logger {
 	
 	private void log(String s,int level)
 	{
+		if(!this.shallLog)
+			return;
 		if(level>this.level)
 		{
 			this.writeInConsole(s+"\n");
@@ -73,7 +85,68 @@ public class Logger {
 	{
 		System.out.print(s);
 	}
+
 	
+	private  ArrayList<logItem> logV = new ArrayList<logItem>();
+	
+	public class logItem
+	{
+		private Point p;
+		private C vec;
+		private double[] color;
+		
+		private logItem(Point p, C vec,Color c)
+		{
+			this.p = p;
+			this.vec = vec;
+			this.color= new double [] {c.getRed(),c.getGreen(),c.getBlue()};
+		}
+		private logItem(Point p, C vec, Color c,double length)
+		{
+			this.p=p;
+			this.vec=new C(new Angle(vec.getTheta().getRad()),length);
+			this.color=new double [] {c.getRed(),c.getGreen(),c.getBlue()};
+		}
+		
+		public Point getPoint()
+		{
+			return this.p;
+		}
+		
+		public C getVec()
+		{
+			return this.vec;
+		}
+		
+		public double[] getColor()
+		{
+			return this.color;
+		}
+		
+	}
+	
+	public void debugV(Point p, C vec,Color c) {
+		logV.add(new logItem(p,vec,c));
+	}
+	
+	public void debugV(Point p, C vec,Color c,double length) {
+		logV.add(new logItem(p,vec,c,length));
+	}
+	
+	public ArrayList<logItem> getVLog()
+	{
+		return this.logV;
+	}
+	
+/*	public ArrayList<Point> getPoints()
+	{
+		return this.logPoints;
+	}*/
+	
+	public void resetV()
+	{
+		this.logV.clear();
+	}
 	
 }
 

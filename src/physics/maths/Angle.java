@@ -22,14 +22,21 @@
 package physics.maths;
 
 public class Angle {
-	
+	public final static double pi = Math.PI; 
 	
 	//CONVERTIR AUTO EN MULTIPLE POSITIF DE 2PI
 	private double value;
 	
-	public Angle(double value)
+	public Angle(double rad)
 	{
-		this.value=value;
+		
+		double ang = rad%(2*pi);
+		if(ang>=pi)
+		{
+			ang-=(2*pi);
+		}
+		
+		this.value=ang;
 	}
 
 	public double getRad() {
@@ -66,4 +73,10 @@ public class Angle {
 		//return Math.toDegrees(rad*Math.PI);
 	}
 	
+	public static double atan(double rad)
+	{
+		C c = new C(new Angle(rad),1);
+		return Math.atan2(c.getIm(), c.getRe());
+	}
+
 }

@@ -61,6 +61,8 @@ public abstract class Entity
 	
 	protected final double mass;
 	
+	//Depreciated private boolean wasCollided = false; // A flag to check if it was collided before leaving another object
+	private ArrayList<Entity> entityCollided = new ArrayList<Entity>(); // list containing current collisions
 	
 	public ArrayList<Point> positions = new ArrayList<Point>();
 	
@@ -248,5 +250,18 @@ public abstract class Entity
 	}
 
 
+	public void setCollidingWith(Entity entity)
+	{
+		this.entityCollided.add(entity);
+	}
+	
+	public boolean wasCollidingWith(Entity entity)
+	{
+		return this.entityCollided.contains(entity);
+	}
+
+	public void wasntCollidingWith(Entity entity2) {
+		this.entityCollided.remove(entity2);
+	}
 
 }

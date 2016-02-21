@@ -25,15 +25,42 @@ package main;
 import org.lwjgl.LWJGLException;
 //import chrriis.dj.nativeswing.NativeSwing;
 import game.FasT;
+import game.entities.Ball;
+import game.entities.EntityHandler;
 import log.Logger;
+import physics.Physics;
+import physics.maths.Angle;
+import physics.maths.C;
+import physics.maths.Point;
 
 public class Main
 {
 	
 	public static void main(String args[]) throws LWJGLException
 	{
-		Logger log = new Logger();
+		
+		//testAngles();
+		//if(true)
+		//return;
+		/*Logger log = new Logger();
 		log.info("Hello, world !");
+		
+		double l = 3*Math.PI/4;
+		double a = Math.tan(l);
+		
+		double b = Math.atan(a);
+		log.info("TEST: atan("+a+"(tan"+Math.toDegrees(l)+"°)) = "+Math.toDegrees(b)+"° = "+ b + " rad");
+	
+		
+		double angle = 3*Math.PI/4;
+		C c = new C(new Angle(angle),1);
+		double arctan = Math.atan2(c.getIm(), c.getRe());
+		log.info("ATAN2="+Math.toDegrees(arctan));
+		
+		
+		if(true)
+		return;*/
+		
 		
 		/*C c = new C(-1,2);
 		log.error(c.getArgument().getDeg());
@@ -51,4 +78,28 @@ public class Main
 
 		fasT.run();
 	}
+	
+	/*public static void testAngles()
+	{
+		Physics physics = new Physics();
+		EntityHandler handler = new EntityHandler();
+		Ball entity1 = new Ball(new Point(0,0),handler);
+		entity1.setVelocity(new C(new Angle(0),1));
+		
+		
+		C t = new C(new Angle(0),1);
+		
+		final double pi = Math.PI;
+		
+		double[] O = new double[] {pi/4,3*pi/4,5*pi/4,7*pi/4};
+		
+		for(double Θ1 : O)
+		{
+		
+			for(double Θ2 : O)
+			{
+				physics.setNewVelocity(Θ1, Θ2, entity1, entity1, t);
+			}
+		}
+	}*/
 }

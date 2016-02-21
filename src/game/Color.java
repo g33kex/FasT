@@ -23,35 +23,49 @@ package game;
 
 public class Color {
 
-	private final int red;
-	private final int green;
-	private final int blue;
+	private final double red;
+	private final double green;
+	private final double blue;
 	
-	public Color(int r, int g, int b)
+	public Color(double r, double g, double b)
 	{
 		this.red=r;
 		this.green=g;
 		this.blue=b;
 	}
+
 	
-	public int getRed()
+	public double getRed()
 	{
 		return this.red;
 	}
 	
-	public int getGreen()
+	public double getGreen()
 	{
 		return this.green;
 	}
 	
-	public int getBlue()
+	public double getBlue()
 	{
 		return this.blue;
 	}
 	
-	public static final Color RED = new Color(255,0,0);
-	public static final Color GREEN = new Color(0,255,0);
-	public static final Color BLUE = new Color(0,0,255);
+	public static final Color RED = new Color(1,0,0);
+	public static final Color GREEN = new Color(0.0,0.9,0.2);
+	public static final Color FLASHGREEN = new Color(0,1,0);
+	public static final Color BLUE = new Color(0,0,1);
+	
+	public static final Color PINK = new Color(1,0.2,0.8);
+	public static final Color ORANGE = new Color(0.95,0.25,0);
+
+	public static final Color GOLD = new Color(0.90,0.6,0.04);
+	
+	public static final Color BLUELIGHT = new Color(0.07,0.7,0.35);
+	
+	public static final Color BLACK = new Color(0,0,0);
+	
+	
+	public static final Color PURPLEDARK = new Color(0.4,0.1,0.2);
 	
 //	public static final Color SCALEGREEN = new Color(0.4, 0.9, 0.1);
 }

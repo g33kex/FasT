@@ -116,8 +116,8 @@ public class FasT {
 			if(p.getY()>tmpy)
 				tmpy=p.getY();
 		}
-		double r = tmpy-entityHandler.get(this.theBall).positions.get(0).getY();
-		this.getLogger().debug("H = "+r);
+		//double r = tmpy-entityHandler.get(this.theBall).positions.get(0).getY();
+		//this.getLogger().debug("H = "+r);
 	}
 	
 	
@@ -355,6 +355,8 @@ public class FasT {
 	
 	//Force du rebond + réaction du support
 	private boolean pos=true;
+	public boolean debug = true;
+	
 	private void handleMouse() 
 	{
 		boolean c = true;
@@ -514,10 +516,14 @@ public class FasT {
 		if(this.lastUpdateTime==-1) 
 			deltatimeinseconds=0;
 
+		this.getLogger().resetV();
 		for(Entity e : this.entityHandler.getEntities())
 		{
 			e.update(physics,deltatimeinseconds,this.entityHandler.getEntities());
 		}
+		
+		this.getPhysicsHandler().updateCollisions(this.entityHandler.getEntities());
+		
 		}
 		this.lastUpdateTime=System.nanoTime();
 		

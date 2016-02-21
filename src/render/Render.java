@@ -32,6 +32,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -68,6 +71,7 @@ import game.Liquid;
 import game.entities.Ball;
 import game.entities.Box;
 import game.entities.Entity;
+import log.Logger.logItem;
 import physics.maths.Angle;
 import physics.maths.C;
 import physics.maths.Maths;
@@ -76,7 +80,13 @@ import physics.maths.Point;
 
 
 public class Render {
-
+/* Render options */
+	protected boolean showArrows = true;
+	
+/*-----------------------*/
+	
+	
+	
 	 private String windowTitle;
 	 private int width,height;
 	
@@ -297,6 +307,7 @@ private void createMenuBar() {
 }
 
 JLabel masseVolumiqueLabel = new JLabel();
+
 public void updateLabels()
 {
 	masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().getMasseVolumique()));
@@ -315,9 +326,49 @@ private void renderMenu()
     });
     JMenuItem about = new JMenuItem("about");
     
+    JMenu options = new JMenu("options");
+    
+    JCheckBoxMenuItem showArrows = new JCheckBoxMenuItem("Show Arrows");
+    showArrows.setState(this.showArrows);
+    showArrows.addItemListener(new ItemListener()
+    		{
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					FasT.getFasT().getRender().showArrows=showArrows.getState();
+				}
+    		}
+    	);
+		
+    
+    JCheckBoxMenuItem debug = new  JCheckBoxMenuItem("Debug");
+    debug.setState(FasT.getFasT().debug);
+    debug.addItemListener(new ItemListener()
+	{
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			FasT.getFasT().debug=debug.getState();
+		}
+	});
+
+    
+    JCheckBoxMenuItem log = new  JCheckBoxMenuItem("Log");
+    log.setState(FasT.getFasT().getLogger().shallLog);
+    log.addItemListener(new ItemListener()
+	{
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			FasT.getFasT().getLogger().shallLog=log.getState();
+		}
+	});
+   
+    
+    options.add(showArrows);
+    options.add(debug);
+    options.add(log);
+    
     file.add(exit);
     file.add(about);
-    
+    file.add(options);    
     JMenu game = new JMenu("game");
     play.setText("play");
     play.addActionListener(new ActionListener(){
@@ -549,6 +600,16 @@ private void renderMenu()
 		
 	}
 	
+	public void drawLine(Point p, C c)
+	{
+		drawLine(p, new Point(p.getX()+c.getRe(),p.getY()+c.getIm()));
+	}
+	
+	public void drawLine(Point p, double angle,double length)
+	{
+		drawLine(p,new C(new Angle(angle),length));
+	}
+	
 	public void drawLine(Point position, Point posMax) {
 		ArrayList<Point> p = new ArrayList<Point>();
 		p.add(position);
@@ -695,6 +756,32 @@ private void renderMenu()
      
 	public boolean flag = false;
 	public void EndRender() {
+		//Render debug
+		if(this.showArrows)
+		{
+		for(logItem item : FasT.getFasT().getLogger().getVLog())
+		{
+			Point p = item.getPoint();
+			C c = item.getVec();
+			double[] color = item.getColor();
+			
+			GL11.glColor3d(color[0],color[1],color[2]);
+			drawLine(p,c);
+			GL11.glColor3d(0.1,0.4,0.8);
+			
+			Point max = new Point(p.getX()+c.getRe(),p.getY()+c.getIm());
+			drawLine(max, c.getTheta().getRad()-3*Math.PI/4,Normal.toReal(6));
+			drawLine(max, c.getTheta().getRad()+3*Math.PI/4,Normal.toReal(6));
+			
+			
+			drawCircle(p,Normal.toReal(1),new float[] {0.1f,0.4f,0.9f});
+			//drawLine(new Point(p.getX()+c.getRe(),p.getY()+c.getIm()),new C(c.getTheta().getRad()+Math.PI/4,0.1));
+			
+		}
+		}
+		
+		
+		
 		GL11.glPopMatrix();
 		
 		Display.update();
