@@ -251,7 +251,12 @@ class B extends A {
 	public void render(Render render) {
 		float[] color = {(float) 0.8,(float) 0.1, (float) 0.3};
 		render.drawCircle(this.position,this.radius,color);	
+		
+		if(render.showTails)
+		{
 		render.drawLines(this.positions);
+		}
+		
 		if(this.isSelected())
 		{
 			render.drawCorners(this.getPosition(),this.getRadius()+0.05,color);

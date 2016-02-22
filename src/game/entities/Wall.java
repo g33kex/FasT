@@ -56,4 +56,8 @@ public class Wall extends Entity {
 		return this.angle;
 	}
 
+	public Point getMaxPos()
+	{
+		return this.posMax;
+	}
 }

@@ -32,10 +32,14 @@ import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Label;
 import java.awt.Toolkit;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 
 import log.Logger;
 
@@ -110,12 +114,15 @@ public class FasT {
 	
 	if(this.isPaused())
 	{
-		double tmpy = 0;
+		
+		//TODO : Tweaking is here !
+		
+		/*double tmpy = 0;
 		for(Point p : entityHandler.get(this.theBall).positions)
 		{
 			if(p.getY()>tmpy)
 				tmpy=p.getY();
-		}
+		}*/
 		//double r = tmpy-entityHandler.get(this.theBall).positions.get(0).getY();
 		//this.getLogger().debug("H = "+r);
 	}
@@ -163,7 +170,7 @@ public class FasT {
 	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
 		
-		//WALLentityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(0),this.getEntityHandler()));
+		entityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(45),this.getEntityHandler()));
 		
 		entityHandler.spawn(new Box(new Point(-4,-3),new Point(4,-1),1,Liquid.WATER(), this.entityHandler));
 		
@@ -175,10 +182,32 @@ public class FasT {
 	
 	private void spawnWalls()
 	{
+		Box l = (Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox);
 		entityHandler.destroy(this.theBox);
 	//	this.theBox=entityHandler.spawn(new Box(new Point(-this.width/2,-this.height/2).toReal(), new Point(this.width/2,this.height/2).toReal(),4,this.entityHandler));
 		
-		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,Liquid.AIR(), this.entityHandler),true);
+		this.theBox=entityHandler.spawn(new Box(new Point(0,0).mouseToReal(),new Point(Display.getWidth(),Display.getHeight()).mouseToReal(),4,l==null ? Liquid.AIR() : l.getLiquid(), this.entityHandler),true);
+		
+	    this.getRender().game.remove(this.getRender().liquid);
+	    
+		this.getRender().liquid = new JMenu("Liquid");
+		 
+	    Box b = (Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox);
+	    b.getPopupMenuFrom(this.getRender().liquid);
+	    
+	    JCheckBoxMenuItem apply = new  JCheckBoxMenuItem("Apply Everywhere");
+	    apply.setState(FasT.getFasT().getPhysicsHandler().applyEverywhere);
+	    apply.addItemListener(new ItemListener()
+		{
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				FasT.getFasT().getPhysicsHandler().applyEverywhere=apply.getState();
+			}
+		});
+	    this.getRender().liquid.add(apply);
+	    
+	    this.getRender().game.add(this.getRender().liquid);
+	   // this.getRender().popupMenu.updateUI();
 		
 		/*entityHandler.clear("wall");
 		entityHandler.spawn(new Wall(new Point(0,0).toReal(),Normal.toReal(this.width),new Angle(0),this.entityHandler));
@@ -246,7 +275,10 @@ public class FasT {
 	               frameCount = 0;
 	               lastSecondTime = thisSecond;
 	            //   log.info("X distance = "+(entityHandler.get(this.theBall).getPosition().getX()-this.ballInit.getX())+"|Y distance = "+(entityHandler.get(this.theBall).getPosition().getY()-this.ballInit.getY()));
-	               this.ballInit=entityHandler.get(this.theBall).getPosition();
+	               if(this.entityHandler.get(this.theBall)!=null)
+	               {
+	            	   this.ballInit=entityHandler.get(this.theBall).getPosition();
+	               }
 	            }
 	            //Yield until it has been at least the target time between renders. This saves the CPU from hogging.
 	            while ( now - lastRenderTime < this.targetRenderPeriod && now - lastUpdateTime < this.period)
@@ -282,10 +314,6 @@ public class FasT {
 			if(Keyboard.getEventKey() == Keyboard.KEY_SPACE)
 			{
 				this.setPaused(!this.isPaused());
-			}
-			if(Keyboard.getEventKey() == Keyboard.KEY_G)
-			{
-				this.physics.GROUND=!this.physics.GROUND;
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_T)
 			{

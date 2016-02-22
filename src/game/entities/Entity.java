@@ -76,7 +76,7 @@ public abstract class Entity
 	
 	public JPopupMenu getPopupMenu() { return this.popupMenu;}
 	//protected JMenu tweak = new JMenu("tweak");
-	protected JMenu options = new JMenu("options");
+	//protected JMenu options = new JMenu("options");
 	
 	protected JLabel speedLabel = new JLabel();
 	protected JLabel ecLabel = new JLabel();
@@ -94,7 +94,7 @@ public abstract class Entity
 		});
 		
 
-		this.popupMenu.add(options);
+		//this.popupMenu.add(options);
 		this.popupMenu.add(speedLabel);
 		this.popupMenu.add(ecLabel);
 		this.popupMenu.add(delete);
@@ -209,7 +209,7 @@ public abstract class Entity
 		}
 		if(this instanceof Ball && entity1 instanceof Wall)
 		{
-			return BB.collisionBallWall(this.getPosition(),((Ball) this).getRadius(),entity1.getPosition(),((Wall)entity1).getAngle());
+			return BB.collisionBallWall(this.getPosition(),((Ball) this).getRadius(),entity1.getPosition(),((Wall)entity1).getMaxPos());
 		}
 		if(this instanceof Ball && entity1 instanceof Box)
 		{

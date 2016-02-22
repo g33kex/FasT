@@ -41,10 +41,13 @@ public class Physics {
 	private C g = new C(new Angle(Angle.convertToRad(-90)),9.81);
 	private final double G = 6.67384*Math.pow(10,-11);
 	
-	public boolean GROUND = false;
+	//public boolean GROUND = false;
 	
 	
-	public int simulationLevel = SimulationLevel.NOTHING; // -1 = Nothing 0 = Univers 1 = chute libre 2 = chute dans un liquide 3 = chute avec frottements 4 = chute avec rebonds
+	public int simulationLevel = SimulationLevel.CHUTE_LIQUID; // -1 = Nothing 0 = Univers 1 = chute libre 2 = chute dans un liquide ///3 = chute avec frottements 4 = chute avec rebonds
+	
+	public boolean rebonds = true; // Do we handle that ?
+	public boolean applyEverywhere = true; // Let's have a BIG box :)
 	
 	private class SimulationLevel
 	{
@@ -52,7 +55,6 @@ public class Physics {
 		public static final int UNIVERS=0;
 		public static final int CHUTE_LIBRE=1;
 		public static final int CHUTE_LIQUID=2;
-		public static final int CHUTE_FRICTION=3;
 	}
 	
 	public Physics()
@@ -62,6 +64,12 @@ public class Physics {
 
 	public void updateCollisions(ArrayList<Entity> entities)
 	{
+		
+		if(!this.rebonds) // REBONDS :)
+		{
+			return;
+		}
+		
 		ArrayList<Entity> entities1 = new ArrayList<Entity>();
 		ArrayList<Entity> entities2 = new ArrayList<Entity>();
 		
@@ -332,11 +340,30 @@ public class Physics {
 		
 	}
 	
+	public void setNewVelocityFixed2(Entity entity1, Entity entity2, C n, C t)
+	{
+			C v = entity1.getVelocity();
+			
+			double Θv = v.getTheta().getRad()-t.getTheta().getRad();
+			
+		//	C V = t.product(Math.cos(Θv)).sum(n.product(Math.sin(Θv))).sum(v.getRho());
+			
+			C cost = t.product(Math.cos(Θv));
+			C sinn = n.product(Math.sin(Θv));
+			
+			C Vf = (sinn.substracte(cost)).product(v.getRho());
+		
+			entity1.setVelocity(Vf);
+	}
+	
 	
 	private void collideEntityWithEntity(Entity entity1, Entity entity2) {
 		
-		entity1.setPosition(entity1.positions.get(entity1.positions.size()-1));
-		entity2.setPosition(entity2.positions.get(entity2.positions.size()-1));
+		if(entity1.positions.size()>1 && entity2.positions.size()>1)
+		{
+			entity1.setPosition(entity1.positions.get(entity1.positions.size()-1));
+			entity2.setPosition(entity2.positions.get(entity2.positions.size()-1));
+		}
 		
 		
 		/*if(entity1.getUUID()!=FasT.getFasT().theBall)
@@ -357,6 +384,7 @@ public class Physics {
 			
 			//Normale
 			C n = new C(x2-x1,y2-y1); // On calcule le vecteur P1, qui représente la droite passant par le centre des objets
+			n = new C(n.getTheta(),1);
 			C t = new C(new Angle(n.getTheta().getRad()-(Math.PI/2)),n.getRho());
 		
 			//FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.BLACK,2);
@@ -371,8 +399,18 @@ public class Physics {
 			double Θ1 = velocity1.getTheta().getRad()-t.getTheta().getRad(); // Calcul de theta 1
 			double Θ2 = velocity2.getTheta().getRad()-t.getOpposite().getTheta().getRad(); // Calcul de theta 2
 	
-				
-			this.setNewVelocity(Θ1, Θ2, entity1, entity2, t);
+			if(entity1.getMass()==-1)
+			{
+				this.setNewVelocityFixed2(entity2,entity1,n,t);
+			}
+			else if(entity2.getMass()==-1)
+			{
+				this.setNewVelocityFixed2(entity1,entity2,n,t);
+			}
+			else
+			{
+				this.setNewVelocity(Θ1, Θ2, entity1, entity2, t);
+			}
 				
 				//FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|Θ1="+Θ1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
 				
@@ -383,6 +421,7 @@ public class Physics {
 	}
 
 	boolean stop = false;
+
 
 	private ArrayList<Entity> getEntitiesCollidingWith(Entity entity,ArrayList<Entity> entities) {
 		
@@ -486,7 +525,7 @@ public class Physics {
 				for(C f : entity.getInstantForces())
 				{
 					F = F.sum(f.div(time));
-					FasT.getFasT().getLogger().debug("FORCE="+F.getRho());	
+					//FasT.getFasT().getLogger().debug("FORCE="+F.getRho());	
 				}
 
 				//Get accélération with F = ma
@@ -543,31 +582,42 @@ public class Physics {
 		if(simulationLevel>=1)
 		{
 			//forces.add(weight(entity.getMass())); // P=mg 
+			boolean isInLiquid = false;
+
 			for(Box box : this.getBoxAround(entity,entities))
 			{
 				forces.add(weight(entity.getMass(),box.g()));
+				isInLiquid=true;
+				break;
+			}
+			if(!isInLiquid && this.applyEverywhere)
+			{
+				Box b = (Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox);
+				forces.add(weight(entity.getMass(),b.g()));
+				
 			}
 			//FasT.getFasT().getLogger().debug("weight="+weight(entity.getMass()));
 		}
 		if(simulationLevel>=2)
 		{
-			for(Box box : this.getBoxAround(entity,entities))
-			{
-				forces.add(archimede(box.getLiquid().getMasseVolumique(),((Ball) entity).getVolumeImmerged(box),g));
-			}
-		}
-		if(simulationLevel>=3)
-		{
+			boolean isInLiquid = false;
 			for(Box box : this.getBoxAround(entity,entities))
 			{
 				if(((Ball)entity).getVolumeImmerged(box)>0)
 				{
-				/*if(box.getUUID()==FasT.getFasT().theBox)
-					continue;*/
-				forces.add(frottements(box.getLiquid(),entity.getVelocity(),entity.getFlow(),((Ball)entity).getAire()));//Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
+					isInLiquid=true;
+					forces.add(archimede(box.getLiquid().getMasseVolumique(),((Ball) entity).getVolumeImmerged(box),g));
+					forces.add(frottements(box.getLiquid(),entity.getVelocity(),entity.getFlow(),((Ball)entity).getAire()));//Math.pow(((Ball)entity).getRadius(),2)*Math.PI));
+					break;
 				}
 			}
-
+			
+			if(!isInLiquid && this.applyEverywhere)
+			{
+				Box b = (Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox);
+				forces.add(archimede(b.getLiquid().getMasseVolumique(),((Ball) entity).getVolume(),g));
+				forces.add(frottements(b.getLiquid(),entity.getVelocity(),entity.getFlow(),((Ball)entity).getAire()));
+			}
 		}
 		
 		
@@ -625,13 +675,13 @@ public class Physics {
 		{
 			double k = fluid.getVisc()*diam*3*Math.PI;// Formule de STOCKES
 			//FasT.getFasT().getLogger().debug("vk="+v.product(-k));
-			FasT.getFasT().getLogger().debug(fluid.getVisc());
+			//FasT.getFasT().getLogger().debug(fluid.getVisc());
 			return v.product(-k);
 		}
 		else if(v.getMod()>5 && v.getMod()<20)
 		{
 			double k = 0.5*fluid.getVisc()*0.45*aire;
-			FasT.getFasT().getLogger().debug(v.product(k));
+			//FasT.getFasT().getLogger().debug(v.product(k));
 			C l = new C(v.getTheta(),Math.pow(v.getRho(),2)*(-k));//1.4 ??
 			//FasT.getFasT().getLogger().debug("l="+l);
 			return l;

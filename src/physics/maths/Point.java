@@ -23,6 +23,8 @@ package physics.maths;
 
 import org.lwjgl.opengl.Display;
 
+import game.FasT;
+
 public class Point {
 	
 	private double x,y;
@@ -58,6 +60,17 @@ public class Point {
 
 	public Point add(Point p) {
 		return new Point(this.x+p.x,this.y+p.y);
+	}
+
+	public double coef(Point b)
+	{
+		FasT.getFasT().getLogger().debug("(b.getX()-this.getX())="+(b.getX()-this.getX())+"||||||(b.getY()-this.getY())="+(b.getY()-this.getY()));
+		return (b.getY()-this.getY())/(b.getX()-this.getX());
+	}
+	
+	public double distance(Point b)
+	{
+		return Math.sqrt(Math.pow(b.getX()-this.getX(),2)+Math.pow(b.getY()-this.getY(),2));
 	}
 	
 }

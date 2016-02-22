@@ -21,6 +21,7 @@
 
 package physics;
 
+import game.FasT;
 import physics.maths.Angle;
 import physics.maths.C;
 import physics.maths.Point;
@@ -55,8 +56,41 @@ public abstract class BB {
 	}
 	
 
-	public static boolean collisionBallWall(Point position, double radius, Point position2, Angle angle) {
-		return position.getY()-radius<=position2.getY();
+	public static boolean collisionBallWall(Point O, double radius, Point A, Point B) {
+		
+		//Vertical
+		if(B.getX() == A.getX())
+		{
+			return Math.abs(O.getX()-B.getX())<=radius;
+		}
+
+		//Horizontal
+		if(B.getY()==A.getY())
+		{
+			return Math.abs(O.getY()-B.getY())<=radius;
+		}
+		
+		
+		double c = A.coef(B);
+		double d = A.getY()-c*A.getX();
+
+		double xC = O.getX();
+		double yC = c*xC+d;
+		double yD = O.getY();
+		double xD = (yD-d)/c;
+		
+		Point C = new Point(xC,yC);
+		Point D = new Point(xD,yD);
+		
+		double h = Math.abs((C.distance(O)*D.distance(O))/(C.distance(D)));
+		
+		
+		FasT.getFasT().getLogger().debug("H="+h+"|c"+c);
+		return h<=radius;
+		
+	
+		
+		//return position.getY()-radius<=position2.getY();
 	}
 
 	public static boolean collisionBallSquare(Point position, double radius, Point position2, Point max) {

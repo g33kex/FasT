@@ -93,6 +93,7 @@ public class Box extends Entity {
 		mvLabel.setText("masse volumique(kg/m^3)="+this.getLiquid().getMasseVolumique());
 		fillLabel.setText("fill (%)="+Maths.dfloor(this.getLiquid().getLevel()*100));
 		vLabel.setText("Viscosite(Pa.s)="+this.getLiquid().getVisc());
+		gLabel.setText("g(m/s^2)="+this.g().getRho());
 	}
 
 	JSlider mvSlider = new JSlider();
@@ -101,24 +102,34 @@ public class Box extends Entity {
 	JSlider fillSlider = new JSlider();
 	JLabel vLabel = new JLabel();
 	JSlider vSlider = new JSlider();
-	JMenuItem red = new JMenuItem("MAKE IT RED");
+	JSlider gSlider = new JSlider();
+	JLabel gLabel = new JLabel();
+	//JMenuItem red = new JMenuItem("MAKE IT RED");
 	
 	JMenu tweak3 = new JMenu("tweak");
 	
+	@Override
 	protected void initPopupMenu()
 	{
 		popupMenu.remove(speedLabel);
 		popupMenu.remove(ecLabel);
 		
-		red.addActionListener(new ActionListener(){
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
+		getPopupMenuFrom(tweak3);
+		this.popupMenu.add(tweak3);
+	    updateLabels();
+		this.popupMenu.pack();
+		
+	}
+	
+	public void getPopupMenuFrom(JMenu tweak3)
+	{
+	
+		/*red.addActionListener(new ActionListener(){public void actionPerformed(ActionEvent e) {
 				double[] color = {0.9,0.3,0.1,0.7};
 				liquid.setColor(color);
 			}
 			
-		});
+		});*/
 
 
 
@@ -169,8 +180,29 @@ public class Box extends Entity {
 				updateLabels();
 			}
 	    });
+	    vSlider.addKeyListener(Render.getSliderKeyListener());
 	    
-	    tweak3.add(red);
+	    gSlider.setMinimum(0);
+	    gSlider.setMaximum(100);
+	    gSlider.setMajorTickSpacing(5);
+	    gSlider.setSnapToTicks(true);
+	    gSlider.setPaintTicks(true);
+	    gSlider.setValue((int) this.g().getRho());
+	    gSlider.addChangeListener(new ChangeListener(){
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				g=new C(g.getTheta(),gSlider.getValue());
+				updateLabels();
+			}
+	    });
+	    
+
+	    gSlider.addKeyListener(Render.getSliderKeyListener());
+
+	  
+
+	    
+	    //tweak3.add(red);
 		
 		tweak3.add(mvLabel);
 		tweak3.add(mvSlider);
@@ -181,9 +213,10 @@ public class Box extends Entity {
 		tweak3.add(fillLabel);
 		tweak3.add(fillSlider);
 		
-		this.popupMenu.add(tweak3);
-	    updateLabels();
-		this.popupMenu.pack();
+		tweak3.add(gLabel);
+		tweak3.add(gSlider);
+		
+		
 	}
 	
 	

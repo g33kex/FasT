@@ -1,5 +1,5 @@
 /*
- *  FasT -- A Fast algorithm for simulaTions. 
+ *  FasT -- A FasT algorithm for simulaTions. 
  * 
  *  Copyright © 2016 Tourdetour
  *
@@ -26,6 +26,7 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -55,6 +56,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.JTextPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -82,6 +84,7 @@ import physics.maths.Point;
 public class Render {
 /* Render options */
 	protected boolean showArrows = true;
+	public boolean showTails = true;
 	
 /*-----------------------*/
 	
@@ -98,6 +101,8 @@ public class Render {
 	 private final JPanel panelOptions = new JPanel();
 	 private final JPanel panelHelp = new JPanel();
 	 public final JPanel BPanel = new JPanel();
+	 
+	public final JMenu game = new JMenu("game");
 	 
 	 public final JMenuItem play = new JMenuItem();
      
@@ -144,8 +149,34 @@ public class Render {
 
 	
 	//We init the GUI by creating the frames
+	JFrame frameAbout;
 	public void initGUI()
 	{
+		//Creating About frame
+		frameAbout = new JFrame();
+
+		frameAbout.setTitle("About FasT");
+		frameAbout.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+	
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    frameAbout.setResizable(false);
+	    
+	  frameAbout.setMinimumSize(new Dimension(400,150));
+	  
+	  JLabel pane = new JLabel(); 
+	  pane.setFont(new Font("serif", 1, 20));
+	  pane.setText("<html>FasT ©, FasT Algorithm for simulaTions, est un logiciel développé par tourdetour depuis septembre 2015 dans le cadre de ce TPE.</html>");
+	  
+	  frameAbout.add(pane);
+	  
+	  frameAbout.setLocation(dim.width/2-frame.getSize().width, dim.height/2-frame.getSize().height);
+	  frameAbout.setVisible(false);
+
+	  
+	  
+	  frame.pack();
+	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
+		
 		//Creating JFRAME
 		frame = new JFrame();
 			
@@ -153,7 +184,6 @@ public class Render {
 		frame.setTitle(this.getWindowTitle());
 
 		//Setting dimension and putting it on the center of the screen
-		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    frame.setResizable(true);
 	 //  frame.setMaximumSize(new Dimension(1280,773));
 
@@ -306,14 +336,16 @@ private void createMenuBar() {
     frame.setJMenuBar(menubar);
 }
 
-JLabel masseVolumiqueLabel = new JLabel();
+//JLabel masseVolumiqueLabel = new JLabel();
 
 public void updateLabels()
 {
-	masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().getMasseVolumique()));
+	//masseVolumiqueLabel.setText("masse volumique(kg/m^3)="+Maths.dfloor(((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().getMasseVolumique()));
 }
 
-private void renderMenu()
+public  JMenu liquid = new JMenu("liquid");
+
+public void renderMenu()
 {
 
     JMenu file = new JMenu("file");
@@ -324,9 +356,26 @@ private void renderMenu()
 			 FasT.getFasT().quit();
 		}
     });
+  
     JMenuItem about = new JMenuItem("about");
-    
+    about.addActionListener(new ActionListener(){
+    	public void actionPerformed(ActionEvent e) {
+ 	     frameAbout.setVisible(true);
+ 	   }
+   });
     JMenu options = new JMenu("options");
+   
+    JCheckBoxMenuItem showTails = new JCheckBoxMenuItem("Show Tails");
+    showTails.setState(this.showTails);
+    showTails.addItemListener(new ItemListener()
+    		{
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					FasT.getFasT().getRender().showTails=showTails.getState();
+				}
+    		}
+    	);
+		
     
     JCheckBoxMenuItem showArrows = new JCheckBoxMenuItem("Show Arrows");
     showArrows.setState(this.showArrows);
@@ -361,7 +410,7 @@ private void renderMenu()
 		}
 	});
    
-    
+    options.add(showTails);
     options.add(showArrows);
     options.add(debug);
     options.add(log);
@@ -369,7 +418,6 @@ private void renderMenu()
     file.add(exit);
     file.add(about);
     file.add(options);    
-    JMenu game = new JMenu("game");
     play.setText("play");
     play.addActionListener(new ActionListener(){
 		@Override
@@ -380,8 +428,9 @@ private void renderMenu()
     game.add(play);
     
     
+   
     
-    String[] states = {"univers","chute libre","chute dans un liquide","chute avec frottements","chute avec rebonds"};
+    String[] states = {"Sans forces","Univers","Chute libre","Chute avec frottements"};
     JRadioButtonMenuItem[] items = new JRadioButtonMenuItem[states.length];
     ButtonGroup modeGroup = new ButtonGroup();
     
@@ -390,7 +439,7 @@ private void renderMenu()
 			  for ( int i = 0; i < items.length; i++ )
 			  {
 		            if ( e.getSource() == items[ i ] ) {
-		               FasT.getFasT().getPhysicsHandler().simulationLevel=i;
+		               FasT.getFasT().getPhysicsHandler().simulationLevel=i-1;
 		               return;
 		            }
 			  }
@@ -405,30 +454,38 @@ private void renderMenu()
     	items[i].addActionListener(modeListener);
     }
     
-    items[1].setSelected(true);
+    items[FasT.getFasT().getPhysicsHandler().simulationLevel+1].setSelected(true);
+
+    JCheckBoxMenuItem rebonds = new  JCheckBoxMenuItem("Rebonds");
+    rebonds.setState(FasT.getFasT().getPhysicsHandler().rebonds);
+    rebonds.addItemListener(new ItemListener()
+	{
+		@Override
+		public void itemStateChanged(ItemEvent e) {
+			FasT.getFasT().getPhysicsHandler().rebonds=rebonds.getState();
+		}
+	});
     
-    JMenu liquid = new JMenu("liquid");
-    JSlider masseVolumiqueSlider = new JSlider();
-    masseVolumiqueSlider.setMinimum(500);
+    
+   // JSlider masseVolumiqueSlider = new JSlider();
+   // masseVolumiqueSlider.setMinimum(500);
   /*  masseVolumiqueSlider.setMajorTickSpacing(300);
     masseVolumiqueSlider.setPaintTicks(true);
     masseVolumiqueSlider.setSnapToTicks(true);*/
-    masseVolumiqueSlider.setMaximum(1500);
-    masseVolumiqueSlider.addChangeListener(new ChangeListener()
+   // masseVolumiqueSlider.setMaximum(1500);
+   /* masseVolumiqueSlider.addChangeListener(new ChangeListener()
     		{
 				@Override
 				public void stateChanged(ChangeEvent e) {
 					((Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox)).getLiquid().setMasseVolumique(masseVolumiqueSlider.getValue());
 					updateLabels();
 				}
-    		});
+    		});*/
+   
     
-    liquid.add(masseVolumiqueLabel);
-    liquid.add(masseVolumiqueSlider);
-    
-    game.add(liquid);
-    
-    
+    //liquid.add(masseVolumiqueLabel);
+   // liquid.add(masseVolumiqueSlider);
+
     JMenu spawn = new JMenu("spawn");
     JMenuItem ball = new JMenuItem("ball");
     JMenuItem box = new JMenuItem("box");
@@ -441,8 +498,8 @@ private void renderMenu()
     });
     box.addActionListener(new ActionListener(){
   		@Override
-  		public void actionPerformed(ActionEvent e) {
-  			FasT.getFasT().getEntityHandler().spawn(new Box(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),new Point(Mouse.getX()+20,Mouse.getY()+20).mouseToReal(),1,Liquid.WATER(),new C(new Angle(Math.PI),4),FasT.getFasT().getEntityHandler()));
+  		public void actionPerformed(ActionEvent e) {//new C(new Angle(Math.PI),4)
+  			FasT.getFasT().getEntityHandler().spawn(new Box(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),new Point(Mouse.getX()+20,Mouse.getY()+20).mouseToReal(),1,Liquid.WATER(),FasT.getFasT().getEntityHandler()));
   		}
       });
       
