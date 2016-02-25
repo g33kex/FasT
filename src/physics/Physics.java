@@ -25,6 +25,7 @@ import java.util.ArrayList;
 
 import physics.maths.Angle;
 import physics.maths.C;
+import physics.maths.Maths;
 import physics.maths.Normal;
 import physics.maths.Normal.Unit;
 import physics.maths.Point;
@@ -34,6 +35,7 @@ import game.Liquid;
 import game.entities.Ball;
 import game.entities.Box;
 import game.entities.Entity;
+import game.entities.Wall;
 
 public class Physics {
 //http://warmaths.fr/SCIENCES/unites/VOL%20CAPA/spher2.htm
@@ -62,10 +64,12 @@ public class Physics {
 	//	g=6; FALLING ON THE MOON
 	}
 
+	//Regular collision methods
+	
 	public void updateCollisions(ArrayList<Entity> entities)
 	{
 		
-		if(!this.rebonds) // REBONDS :)
+		if(!this.rebonds || true) // REBONDS :)
 		{
 			return;
 		}
@@ -76,13 +80,29 @@ public class Physics {
 		//Detect collisions (better method)
 		for(Entity entity1 : entities)
 		{
+			//if(!(entity1 instanceof Ball))
+				//continue;
 			for(Entity entity2 : entities)
 			{
+				//if(!(entity2 instanceof Ball))
+					//continue;
+				
+
+				if(entity1==entity2)
+					continue;
+				
 				if(entity1.collidesWith(entity2))
 				{
-					if(entity1==entity2)
-						continue;
-					
+					if(entity1 instanceof Box && entity2 instanceof Ball)
+					{
+						collisionBox((Ball)entity2,(Box)entity1);
+					}
+					else if(entity2 instanceof Box && entity1 instanceof Ball)
+					{
+						collisionBox((Ball)entity1,(Box)entity2);
+					}
+					else
+					{
 					if(!(entities1.contains(entity1) | entities1.contains(entity2) | entities2.contains(entity1) | entities2.contains(entity2)))
 					{
 						if(!(entity1.wasCollidingWith(entity2) || entity2.wasCollidingWith(entity1)))
@@ -98,9 +118,11 @@ public class Physics {
 							entities2.add(entity2);
 						}
 					}
+					}
 				}
 				else
 				{
+					
 					entity1.wasntCollidingWith(entity2);
 				}
 			}
@@ -115,116 +137,100 @@ public class Physics {
 		
 	}
 	
-	public boolean update(Entity entity, double deltat,ArrayList<Entity> entities) {
+    private void collideEntityWithEntity(Entity entity1, Entity entity2) {
 		
-		/*for(Entity entityColliding : this.getEntitiesCollidingWith(entity,entities))
+		if(entity1.positions.size()>1 && entity1 instanceof Ball)
 		{
-			if(entity.getUUID() == FasT.getFasT().theBall)
-				this.collideEntityWithEntity(entity,entityColliding);
+			entity1.positions.remove(entity1.positions.size()-1);
+			entity1.setPosition(entity1.positions.get(entity1.positions.size()-1));
+		}
+		if(entity2.positions.size()>1 && entity2 instanceof Ball)
+		{
+			entity2.positions.remove(entity2.positions.size()-1);
+			entity2.setPosition(entity2.positions.get(entity2.positions.size()-1));
+		}
+		
+		
+		/*if(entity1.getUUID()!=FasT.getFasT().theBall)
+			return;*/
+		/*if(entity1.wasCollided() || entity2.wasCollided())
+		{
+			FasT.getFasT().getLogger().debug("Whooooppss two collisions");
+			return;
 		}*/
+			C velocity1 = entity1.getVelocity();
+			C velocity2 = entity2.getVelocity();
 		
-		if(entity.getMass()==-1)
-			return false;
-		this.updatePosition(entity, deltat, entities);
+			double x1 = entity1.getPosition().getX(); // Position X de l'objet 1
+			double y1 = entity1.getPosition().getY(); // Position Y de l'objet 1
+			double x2 = entity2.getPosition().getX(); // Position X de l'objet 2
+			double y2 = entity2.getPosition().getY(); // Position Y de l'objet 2
+
+			
+			//Normale
+			C n = new C(x2-x1,y2-y1); // On calcule le vecteur P1, qui représente la droite passant par le centre des objets
+			n = new C(n.getTheta(),1);
+			C t = new C(new Angle(n.getTheta().getRad()-(Math.PI/2)),n.getRho());
 		
-		return true;
-		
+			//FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.BLACK,2);
+			
+		//	C P1 = new C(new Angle(t.getTheta().getRad()+Math.PI),n.getRho());//new C(new Angle((Math.PI/2)-n.getTheta().getRad()),n.getRho());
+			
+	
+			//FasT.getFasT().getLogger().debugV(entity1.getPosition(),P1,Color.BLUE,2);
+
+			
+			double Θ1 = velocity1.getTheta().getRad()-t.getTheta().getRad(); // Calcul de theta 1
+			double Θ2 = velocity2.getTheta().getRad()-t.getOpposite().getTheta().getRad(); // Calcul de theta 2
+	
+			if(entity1.getMass()==-1)
+			{
+				this.setNewVelocityFixed2(entity2,entity1);
+			}
+			else if(entity2.getMass()==-1)
+			{
+				this.setNewVelocityFixed2(entity1,entity2);
+			}
+			else
+			{
+				FasT.getFasT().getLogger().debugV(entity1.getPosition(),t,Color.BLACK,2);
+				FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.BLACK,2);
+				this.setNewVelocity(Θ1, Θ2, entity1, entity2, t);
+			}
+				
+				//FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|Θ1="+Θ1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
+				
+				if(FasT.getFasT().debug)
+				{
+				FasT.getFasT().setPaused(true);	
+				}
 	}
 	
-	/*******
-	private void collideEntityWithEntity(Entity entity, Entity entityC) {
-		if(stop)
-			return;
-		
-		if(entity.getUUID()!=FasT.getFasT().theBall)
-			return;
-		
-		if(false)//entityC.getMass()==-1)
-		{
-			//entity.velocity=0;
-			//g=0;
-		}
-		else
+	public void collisionBox(Ball ball,Box box)
+	{
+		//FasT.getFasT().getLogger().debug("BOXCOLL");
+		for(Wall wall : box.getWalls())
 		{
 			
-			C velocity1 = entity.getVelocity();
-			C velocity2 = new C();//;entityC.getVelocity();
-			
-			double v1 = velocity1.getRho();
-			double v2 = velocity2.getRho();
-			
-			//NV = V-P-PI/2 => V = NV+P+PI/2
-			C P1 = new C(entityC.getPosition().getX()-entity.getPosition().getX(),entityC.getPosition().getY()-entity.getPosition().getY());
-			
-			//C T1 = velocity1.substracte(P1).substracte(Math.PI/2);
-			double o1 = velocity1.getTheta().getRad()-P1.getTheta().getRad()-(Math.PI/2);
-			
-			//double o1 = T1.getTheta().getRad();
-			
-			
-		//	double t1 = velocity1.getTheta().getRad();
-		//	double t2 = velocity2.getTheta().getRad();
-			
-		//	double ab = Math.atan((entity.getPosition().getY()-entityC.getPosition().getY())/(entity.getPosition().getX()-entityC.getPosition().getX()));
-			//double a = ab-(Math.PI/2);
-			
-		//	double o1 = ab+t1-(Math.PI/2);
-		//	double o2 = a-t2;
-			
+			//FasT.getFasT().getLogger().debug("WALLCOLL");
+			if(ball.collidesWith(wall))
+			{
+				if(!box.wasCollidingWith(wall))
+				{
+
+					FasT.getFasT().getLogger().warning("Object "+ball.getUUID() + " collides with wallbox"+wall.getUUID());
 					
-			double m1 = entity.getMass();
-			double m2 = 0;//entityC.getMass();
-			
-			double V1 = 0;
-			double V2 = 0;
-			double O1 = 0;
-			double O2 = 0;
-			
-			if(true);//entityC.getVelocity().getRho()==0)
-			{
-				O1 = Math.atan(((m1-m2)/(m1+m2))*Math.tan(o1));
-				V1 = Math.sqrt(Math.pow(((m1-m2)/(m1+m2)*v1*Math.sin(o1)), 2)+Math.pow(v1*Math.cos(o1), 2));
-				
-				//C V1a = new C(new Angle(O1),V1);
-				
-				//C V1b = V1a.sum(P1).sum(Math.PI/2);
-				
-				C V1b = new C(new Angle(V1+P1.getTheta().getRad()+(Math.PI/2)),V1);
-				
-				FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|o1="+o1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
-				entity.setVelocity(V1b);
-				//entity.setVelocity(new C(new Angle(O1),v1));
-			//	entityC.setVelocity(new C(new Angle(O2),V2));
-				
-			//	entity.setPosition(entity.positions.get(entity.positions.size()-2));
-				//entity.setVelocity(new C(entity.getVelocity().getRe(),-entity.getVelocity().getIm()));
+					ball.setCollidingWith(wall);
+					
+					collideEntityWithEntity(ball,wall);
+				}
 			}
-			
-		
-			
-			/*if(entity.getMass()==entityC.getMass())
+			else
 			{
-				
-				O1 = Math.atan((v2/v1)*(Math.sin(o2)/Math.cos(o1)));
-				O2 = Math.atan((v1/v2)*(Math.sin(o1)/Math.cos(o2)));
-				
-				V1 = (v1*((m1-m2)/(m1+m2)))+(v2*((2*m2)/(m1*m2)));
-				V2 = (v1*((2*m1)/(m2+m1)))+(v2*((m2-m1)/(m1*m2)));
-				
+				ball.wasCollidingWith(wall);
 			}
-			
-			
-			//stop=true;
-			
-			/*entity.setVelocity(entity.getVelocity().getConj());
-			entityColliding.setVelocity(entityColliding.getVelocity().getConj());
-			
-			
 		}
-		
-		
-		
-	}**********/
+	}
 	
 	public void setNewVelocity(double Θ1, double Θ2,Entity entity1,Entity entity2, C t)
 	{
@@ -340,118 +346,264 @@ public class Physics {
 		
 	}
 	
-	public void setNewVelocityFixed2(Entity entity1, Entity entity2, C n, C t)
+	public void setNewVelocityFixed2(Entity entity1, Entity entity2)
 	{
-			C v = entity1.getVelocity();
-			
-			double Θv = v.getTheta().getRad()-t.getTheta().getRad();
-			
-		//	C V = t.product(Math.cos(Θv)).sum(n.product(Math.sin(Θv))).sum(v.getRho());
-			
-			C cost = t.product(Math.cos(Θv));
-			C sinn = n.product(Math.sin(Θv));
-			
-			C Vf = (sinn.substracte(cost)).product(v.getRho());
 		
-			entity1.setVelocity(Vf);
-	}
-	
-	
-	private void collideEntityWithEntity(Entity entity1, Entity entity2) {
-		
-		if(entity1.positions.size()>1 && entity2.positions.size()>1)
-		{
-			entity1.setPosition(entity1.positions.get(entity1.positions.size()-1));
-			entity2.setPosition(entity2.positions.get(entity2.positions.size()-1));
-		}
-		
-		
-		/*if(entity1.getUUID()!=FasT.getFasT().theBall)
-			return;*/
-		/*if(entity1.wasCollided() || entity2.wasCollided())
-		{
-			FasT.getFasT().getLogger().debug("Whooooppss two collisions");
-			return;
-		}*/
-			C velocity1 = entity1.getVelocity();
-			C velocity2 = entity2.getVelocity();
-		
-			double x1 = entity1.getPosition().getX(); // Position X de l'objet 1
-			double y1 = entity1.getPosition().getY(); // Position Y de l'objet 1
-			double x2 = entity2.getPosition().getX(); // Position X de l'objet 2
-			double y2 = entity2.getPosition().getY(); // Position Y de l'objet 2
-
-			
-			//Normale
-			C n = new C(x2-x1,y2-y1); // On calcule le vecteur P1, qui représente la droite passant par le centre des objets
-			n = new C(n.getTheta(),1);
-			C t = new C(new Angle(n.getTheta().getRad()-(Math.PI/2)),n.getRho());
-		
-			//FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.BLACK,2);
-			
-		//	C P1 = new C(new Angle(t.getTheta().getRad()+Math.PI),n.getRho());//new C(new Angle((Math.PI/2)-n.getTheta().getRad()),n.getRho());
-			
-	
-			//FasT.getFasT().getLogger().debugV(entity1.getPosition(),P1,Color.BLUE,2);
-			FasT.getFasT().getLogger().debugV(entity1.getPosition(),t,Color.BLACK,2);
-			FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.BLACK,2);
-			
-			double Θ1 = velocity1.getTheta().getRad()-t.getTheta().getRad(); // Calcul de theta 1
-			double Θ2 = velocity2.getTheta().getRad()-t.getOpposite().getTheta().getRad(); // Calcul de theta 2
-	
-			if(entity1.getMass()==-1)
+			if(entity2 instanceof Wall)
 			{
-				this.setNewVelocityFixed2(entity2,entity1,n,t);
-			}
-			else if(entity2.getMass()==-1)
-			{
-				this.setNewVelocityFixed2(entity1,entity2,n,t);
-			}
-			else
-			{
-				this.setNewVelocity(Θ1, Θ2, entity1, entity2, t);
-			}
+				Wall wall = (Wall) entity2;
+				C t = new C(wall.getAngle(),1).getOpposite();
 				
-				//FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|Θ1="+Θ1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
+				C n = new C(new Angle(t.getTheta().getRad()-Math.PI/2),1);
 				
-				if(FasT.getFasT().debug)
-				{
-				FasT.getFasT().setPaused(true);	
-				}
-	}
 
-	boolean stop = false;
-
-
-	private ArrayList<Entity> getEntitiesCollidingWith(Entity entity,ArrayList<Entity> entities) {
-		
-		ArrayList<Entity> collideList = new ArrayList<Entity>();
-		if(stop)
-			return collideList;
-		/*for(Entity entity1: entities)
-		{
-			if(entity==entity1)
-				continue;
-			if(entity.collidesWith(entity1))
-			{
-				if(!(entity.wasCollided() || entity1.wasCollided()))
-				{
-					FasT.getFasT().getLogger().warning("Object "+entity.getUUID() + " collides with object "+entity1.getUUID());
-					collideList.add(entity1);
-				}
+			//DEBUG	FasT.getFasT().getLogger().debugV(entity1.getPosition(),t,Color.BLACK,2);
+			//DEBUG	FasT.getFasT().getLogger().debugV(entity1.getPosition(),n,Color.PINK,2);
+				
+				C v = entity1.getVelocity();
+				
+				double Θv = v.getTheta().getRad()-t.getTheta().getRad();
+				
+			//	C V = t.product(Math.cos(Θv)).sum(n.product(Math.sin(Θv))).sum(v.getRho());
+				
+				C cost = t.product(Math.cos(Θv));
+				C sinn = n.product(Math.sin(Θv));
+				
+				C Vf = (sinn.sum(cost)).product(v.getRho());
+			
+				entity1.setVelocity(Vf);
 			}
-		}
-		if(collideList.isEmpty())
+	}
+	
+	
+	//End regular collisions
+	
+	
+	//Real collisions
+	
+	public double predictCollisions(Entity e1, ArrayList<Entity> entities, double deltat)
+	{
+		if(!this.rebonds || !(e1 instanceof Ball))
+			return deltat;
+	
+	Ball ball = (Ball) e1;
+	
+	ArrayList<Wall> walls = new ArrayList<Wall>();
+	
+	for(Entity entity : entities)
+	{
+		if(entity==ball)
+			continue;
+		
+		if(entity instanceof Wall)
+			walls.add((Wall) entity);
+		
+		if(entity instanceof Box)
+			walls.addAll(((Box)entity).getWalls());
+	}
+	
+	
+	double minT = deltat;
+	Point newPosition = ball.getPosition();
+	Wall wallColliding = null;
+	for(Wall wall : walls)
+	{
+		Point currentPosition = ball.getPosition();
+		double currentT = predictCollision(ball.getVelocity(),currentPosition,ball.getRadius(),wall,deltat);
+
+		if(currentT < minT)
 		{
-			entity.flagCollided(false);
-		}*/
-		return collideList;
+			minT=currentT;
+			newPosition=currentPosition;
+			wallColliding = wall;
+		}
+		else if(currentT == minT)
+		{
+			//FasT.getFasT().getLogger().debug("two collisions at the same time !");
+		}
+	}
+	if(minT!=deltat)
+	{
+		ball.setPosition(newPosition);
+		this.setNewVelocityFixed2(ball, wallColliding);
+//		FasT.getFasT().getLogger().debug("Detecting collision between ball "+ball.getUUID()+" and wall "+wallColliding.getUUID());
+		return deltat-minT;
+	}
+	
+
+	return deltat;	
 	}
 
+	public double predictCollision(C velocity,Point position,double radius,Wall wall,double deltat)
+	{
+		FasT.getFasT().getLogger().debugV(position, velocity,Color.GREEN);
+		C Va = velocity;
+		C Ra0 = position.getC();
+		
+		C Rp0 = wall.getPosition().getC();
+		C Rp1 = wall.getMaxPos().getC();
+
+		C Rt = Rp1.substracte(Rp0).div(Rp1.substracte(Rp0).getMod()); // P1-P0 / ||P1-P0||
+		C Rn = new C(new Angle(Rt.getTheta().getRad()+Math.PI/2),1);
+		
+		FasT.getFasT().getLogger().debugV(position, Rn, Color.BLACK);
+	
+		
+		//Equation du second degré
+		
+		C R0 = Ra0.substracte(Rp0);
+		
+		//FasT.getFasT().getLogger().debugV(wall.getPosition(), R0, Color.BLUE);
+		
+		double r0 = R0.scal(Rn);
+		
+		//FasT.getFasT().getLogger().debugV(wall.getPosition(), new C(Rn.getTheta(),r0), Color.GOLD);
+		
+		double v = Va.scal(Rn);
+		
+		//FasT.getFasT().getLogger().debugV(position, new C(Rn.getTheta(),v), Color.BLACK);
+		
+		
+		//double D = Math.abs(r0+v*deltat);
+		
+
+		
+		//FasT.getFasT().getLogger().debug(Maths.dfloor(D)+"<=>"+radius);
+	/*	FasT.getFasT().getLogger().debugV(position, new C(Rn.getOpposite().getTheta(),v*deltat+radius), Color.GOLD);
+		//D>radius
+		if(v*deltat+radius<r0)
+		{
+			return deltat;
+		}
+		else if(true)
+		{
+			return 0.001;
+			}
+		*/
+		
+		
+		double D = radius;
+					
+		double A = v*v; 
+		double B = 2*r0*v; 
+	//	double C = r0*r0-D*D;
+		
+		//FasT.getFasT().getLogger().debugV(new Point(0,0),new C(new Angle(Rn.getTheta().getRad()-Math.PI/2),4*A*C), Color.GOLD);
+		//FasT.getFasT().getLogger().debugV(new Point(0,0),new C(Rn.getTheta(),B*B), Color.PINK);
+		
+		//FasT.getFasT().getLogger().debugV(new Point(0,0),new C(new Angle(Rn.getTheta().getRad()-Math.PI/4),B*B-4*A*C), Color.PINK);
+		
+		//Discriminant
+		//double Δ = Maths.Δ(A, B, C);
+		double Δ = 4*v*v*D*D; 
+		
+		double sqrtΔ = Math.abs(2*v*D);
+		
+		
+		//FasT.getFasT().getLogger().warning("Δ="+Δ + " and 4v^2D^2="+ 4*v*v*D*D);
+		
+		if(v==0)
+		{
+			FasT.getFasT().getLogger().debug("Impossible, droites parralèles");
+			return deltat;
+		}
+		else if(Δ==0)
+		{
+			FasT.getFasT().getLogger().error("La balle ne possède qu'un point");
+			return deltat;
+		}
+		else
+		{
+			double t1 = (-B+sqrtΔ) / (2*A);
+			double t2 = (-B-sqrtΔ) / (2*A);
+			
+			//FasT.getFasT().getLogger().debug("T1="+t1+" and T2="+t2);
+			
+			double t = deltat;
+			if(t1>0 && t2>0)
+			{
+				t = Math.min(t1, t2);
+			}
+			else if(t1 <0 && t2 >0)
+			{
+				t= t2; 
+			}
+			else if(t2<0 && t1>0)
+			{
+				t= t1;
+			}
+			
+			if(t!=deltat)
+			{
+				C Ra1 = Ra0.sum(Va.product(t));
+				C R1 = Ra1.substracte(Rp0);
+				
+				double r1 = R1.scal(Rt);
+				
+				Point p = new Point(Ra1.getRe(),Ra1.getIm());
+				// && 
+				FasT.getFasT().getLogger().debugV(wall.getPosition(),new C(new Angle(Rt.getTheta().getRad()),Math.abs(R1.scal(Rn))), Color.BLUE);	
+				
+				if(r1>-radius*2 && r1<(Rp1.substracte(Rp0).getMod()+radius*2))
+				{
+				if(Math.abs(R1.scal(Rn))>radius/2)
+				{
+					position = p;
+					return t;
+				}
+				}
+				
+				
+				
+			}
+			
+			return deltat; 
+		}
+
+	}
+
+	/*Point A = ball.getPosition();
+	Point B = point;
+
+	//y=ax+b
+	double a = A.coef(B);
+	double b = A.getY()-a*A.getX();*/
+	
+	/*Point C = wall.getPosition();
+	Point D = wall.getMaxPos();
+	
+	//y=cx+d
+	double c = C.coef(D);
+	double d = C.getY()-c*C.getX();
+	
+	//Get segment intersection*/
+	
+
+	
+	//End real collisions
+
+	
+	//Mise a jour des entités
+	public boolean update(Entity entity, double deltat,ArrayList<Entity> entities) {
+		
+		/*for(Entity entityColliding : this.getEntitiesCollidingWith(entity,entities))
+		{
+			if(entity.getUUID() == FasT.getFasT().theBall)
+				this.collideEntityWithEntity(entity,entityColliding);
+		}*/
+		
+		if(entity.getMass()==-1)
+			return false;
+		this.updatePosition(entity, deltat, entities);
+		
+		return true;
+		
+	}
 	private void updatePosition(Entity entity, double deltat,ArrayList<Entity> entities)
 	{
 		//FasT.getFasT().getLogger().info("New tic after " + deltat );//+ "("+deltat2+")" + "'"+(deltat2-deltat)+"'");
 				double time = deltat; // s
+				
 				
 				
 				//Méthode générique
@@ -488,6 +640,19 @@ public class Physics {
 				//F = ma => a=F/m (kg/ms^2 / kg = ms^2)
 
 
+				//Check collisions
+				double newDeltat = 0;
+				//if(!(entity instanceof Ball) || !this.predictCollisions((Ball) entity, new Point(newPos.getRe(),newPos.getIm()), entities));
+				if((newDeltat = this.predictCollisions(entity, entities,deltat)) != deltat)
+				{
+					//this.updatePosition(entity, newDeltat, entities);
+					//FasT.getFasT().getLogger().debug("Collision");
+					if(FasT.getFasT().debug)
+					{
+						FasT.getFasT().setPaused(true);	
+					}
+					return;
+				}
 				
 				
 				
@@ -555,12 +720,16 @@ public class Physics {
 				C newPos = pos.sum(d);
 				
 				entity.setPosition(new Point(newPos.getRe(),newPos.getIm()));
+
 				
 				
-				FasT.getFasT().getLogger().debugV(entity.getPosition(), entity.getVelocity(),Color.GREEN);
+				//FasT.getFasT().setPaused(true);
+		//		FasT.getFasT().getLogger().debugV(entity.getPosition(), entity.getVelocity(),Color.GREEN);
 			
 	}
 	
+	
+	//Somme des forces
 	
 	//Retourne la somme des forces qui s'appliquent sur l'objet (hors collisions) en fonction de sa position relative aux autres objets, la gravité, les forces de frottement, en fonction du niveau de simulation
  	private C getForces(Entity entity, ArrayList<Entity> entities)
@@ -688,7 +857,7 @@ public class Physics {
 		}
 		else
 		{
-			FasT.getFasT().getLogger().debug("VERY FAST");
+		//	FasT.getFasT().getLogger().debug("VERY FAST");
 			double k = 0.5*fluid.getVisc()*0.45*aire;
 			C l = new C(v.getTheta(),Math.pow(v.getRho(), 3)*(-k));
 			return l;
@@ -722,6 +891,8 @@ public class Physics {
 	}
 	
 	
+	//Calcul des intégrales...
+	
 	private C acceleration(C F,double mass)
 	{
 		return F.div(mass);
@@ -751,4 +922,125 @@ public class Physics {
 		return g1.product(mass);
 	}
 	
+	
+	//Unused
+	@Deprecated 
+private ArrayList<Entity> getEntitiesCollidingWith(Entity entity,ArrayList<Entity> entities) {
+		
+		ArrayList<Entity> collideList = new ArrayList<Entity>();
+	
+		/*for(Entity entity1: entities)
+		{
+			if(entity==entity1)
+				continue;
+			if(entity.collidesWith(entity1))
+			{
+				if(!(entity.wasCollided() || entity1.wasCollided()))
+				{
+					FasT.getFasT().getLogger().warning("Object "+entity.getUUID() + " collides with object "+entity1.getUUID());
+					collideList.add(entity1);
+				}
+			}
+		}
+		if(collideList.isEmpty())
+		{
+			entity.flagCollided(false);
+		}*/
+		return collideList;
+	}
 }
+	/*******
+	private void collideEntityWithEntity(Entity entity, Entity entityC) {
+		if(stop)
+			return;
+		
+		if(entity.getUUID()!=FasT.getFasT().theBall)
+			return;
+		
+		if(false)//entityC.getMass()==-1)
+		{
+			//entity.velocity=0;
+			//g=0;
+		}
+		else
+		{
+			
+			C velocity1 = entity.getVelocity();
+			C velocity2 = new C();//;entityC.getVelocity();
+			
+			double v1 = velocity1.getRho();
+			double v2 = velocity2.getRho();
+			
+			//NV = V-P-PI/2 => V = NV+P+PI/2
+			C P1 = new C(entityC.getPosition().getX()-entity.getPosition().getX(),entityC.getPosition().getY()-entity.getPosition().getY());
+			
+			//C T1 = velocity1.substracte(P1).substracte(Math.PI/2);
+			double o1 = velocity1.getTheta().getRad()-P1.getTheta().getRad()-(Math.PI/2);
+			
+			//double o1 = T1.getTheta().getRad();
+			
+			
+		//	double t1 = velocity1.getTheta().getRad();
+		//	double t2 = velocity2.getTheta().getRad();
+			
+		//	double ab = Math.atan((entity.getPosition().getY()-entityC.getPosition().getY())/(entity.getPosition().getX()-entityC.getPosition().getX()));
+			//double a = ab-(Math.PI/2);
+			
+		//	double o1 = ab+t1-(Math.PI/2);
+		//	double o2 = a-t2;
+			
+					
+			double m1 = entity.getMass();
+			double m2 = 0;//entityC.getMass();
+			
+			double V1 = 0;
+			double V2 = 0;
+			double O1 = 0;
+			double O2 = 0;
+			
+			if(true);//entityC.getVelocity().getRho()==0)
+			{
+				O1 = Math.atan(((m1-m2)/(m1+m2))*Math.tan(o1));
+				V1 = Math.sqrt(Math.pow(((m1-m2)/(m1+m2)*v1*Math.sin(o1)), 2)+Math.pow(v1*Math.cos(o1), 2));
+				
+				//C V1a = new C(new Angle(O1),V1);
+				
+				//C V1b = V1a.sum(P1).sum(Math.PI/2);
+				
+				C V1b = new C(new Angle(V1+P1.getTheta().getRad()+(Math.PI/2)),V1);
+				
+				FasT.getFasT().getLogger().debug("v1="+v1+"|V1="+V1+"|o1="+o1+"|O1="+O1+"|V1b="+V1b.getTheta().getRad());
+				entity.setVelocity(V1b);
+				//entity.setVelocity(new C(new Angle(O1),v1));
+			//	entityC.setVelocity(new C(new Angle(O2),V2));
+				
+			//	entity.setPosition(entity.positions.get(entity.positions.size()-2));
+				//entity.setVelocity(new C(entity.getVelocity().getRe(),-entity.getVelocity().getIm()));
+			}
+			
+		
+			
+			/*if(entity.getMass()==entityC.getMass())
+			{
+				
+				O1 = Math.atan((v2/v1)*(Math.sin(o2)/Math.cos(o1)));
+				O2 = Math.atan((v1/v2)*(Math.sin(o1)/Math.cos(o2)));
+				
+				V1 = (v1*((m1-m2)/(m1+m2)))+(v2*((2*m2)/(m1*m2)));
+				V2 = (v1*((2*m1)/(m2+m1)))+(v2*((m2-m1)/(m1*m2)));
+				
+			}
+			
+			
+			//stop=true;
+			
+			/*entity.setVelocity(entity.getVelocity().getConj());
+			entityColliding.setVelocity(entityColliding.getVelocity().getConj());
+			
+			
+		}
+		
+		
+		
+	}**********/
+

@@ -41,6 +41,7 @@ import org.lwjgl.input.Keyboard;
 
 import game.FasT;
 import javafx.scene.input.KeyCode;
+import physics.BB;
 import physics.BBCircle;
 import physics.maths.Angle;
 import physics.maths.C;
@@ -246,6 +247,15 @@ class B extends A {
 		this.setMV(1.9*Math.pow(10, 27));
 		this.initPopupMenu();
 	}
+	
+	public Ball(Point position,EntityHandler entityHandler,double mass)
+	{
+		super(position,mass,entityHandler);
+		this.radius=1;
+		this.boundingBox = new BBCircle(this.position, radius);
+		this.setMV(mass/this.getVolume());
+		this.initPopupMenu();
+	}
 
 	@Override
 	public void render(Render render) {
@@ -316,5 +326,9 @@ class B extends A {
 		return true;
 	}
 	
+	public boolean isEntityUnder(Point p)
+	{
+		return BB.distanceBetweenTwoPoints(p,this.getPosition())<this.getRadius();
+	}
 	
 }

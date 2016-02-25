@@ -195,6 +195,21 @@ public class C {
 		return new Angle(Math.atan2(c1.getIm(), c1.getRe()));
 	}
 
+	
+	//Vectors methods
+	
+	public double scal(C rn) {
+		return scal(this,rn);
+	}
+	
+	private double scal(C V1, C V2)
+	{
+		return V1.getRe()*V2.getRe()+V1.getIm()*V2.getIm();
+	}
+	
+	//End
+	
+	
 
 	private double getRe(Angle theta, double rho) {
 		return rho*Math.cos(theta.getRad());
@@ -212,6 +227,8 @@ public class C {
 			return (c1.re==0 ? "" : c1.re) + "-" + -c1.im + "i";
 		return c1.re + "";
 	}
+
+
 	
 	
 	/*public C ToXY() 

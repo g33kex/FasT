@@ -64,13 +64,18 @@ public class Point {
 
 	public double coef(Point b)
 	{
-		FasT.getFasT().getLogger().debug("(b.getX()-this.getX())="+(b.getX()-this.getX())+"||||||(b.getY()-this.getY())="+(b.getY()-this.getY()));
+		//FasT.getFasT().getLogger().debug("(b.getX()-this.getX())="+(b.getX()-this.getX())+"||||||(b.getY()-this.getY())="+(b.getY()-this.getY()));
 		return (b.getY()-this.getY())/(b.getX()-this.getX());
 	}
 	
 	public double distance(Point b)
 	{
 		return Math.sqrt(Math.pow(b.getX()-this.getX(),2)+Math.pow(b.getY()-this.getY(),2));
+	}
+	
+	public C getC()
+	{
+		return new C(this.getX(),this.getY());
 	}
 	
 }

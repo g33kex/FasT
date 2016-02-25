@@ -73,6 +73,7 @@ import game.Liquid;
 import game.entities.Ball;
 import game.entities.Box;
 import game.entities.Entity;
+import game.entities.Wall;
 import log.Logger.logItem;
 import physics.maths.Angle;
 import physics.maths.C;
@@ -83,7 +84,7 @@ import physics.maths.Point;
 
 public class Render {
 /* Render options */
-	protected boolean showArrows = true;
+	protected boolean showArrows = false;
 	public boolean showTails = true;
 	
 /*-----------------------*/
@@ -206,7 +207,7 @@ public class Render {
 	     panelHelp.setBackground(Color.RED);
 	  
          	HelpBrowser browser = new HelpBrowser();
-         	browser.setHomePage(FasT.class.getResource("/website/index.html").toExternalForm());
+         	browser.setHomePage("/website/index.html");
            
          panelHelp.add(browser);
 	     
@@ -247,7 +248,7 @@ public class Render {
 	     frame.getContentPane().add(panelLeft,BorderLayout.CENTER);
 	      
 	     
-	     
+	     panelHelp.setVisible(true);
 	     frame.pack();
 	     frame.setLocation(dim.width/2-frame.getSize().width/2, dim.height/2-frame.getSize().height/2);
 		  //  frame.setMinimumSize(new Dimension(765,frame.getHeight()));
@@ -365,6 +366,18 @@ public void renderMenu()
    });
     JMenu options = new JMenu("options");
    
+    JCheckBoxMenuItem showHelp = new JCheckBoxMenuItem("Help Panel");
+    showHelp.setState(this.panelHelp.isVisible());
+    showHelp.addItemListener(new ItemListener()
+    		{
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					FasT.getFasT().getRender().panelHelp.setVisible(showHelp.getState());
+				}
+    		}
+    	);
+    
+    
     JCheckBoxMenuItem showTails = new JCheckBoxMenuItem("Show Tails");
     showTails.setState(this.showTails);
     showTails.addItemListener(new ItemListener()
@@ -410,6 +423,7 @@ public void renderMenu()
 		}
 	});
    
+    options.add(showHelp);
     options.add(showTails);
     options.add(showArrows);
     options.add(debug);
@@ -489,7 +503,14 @@ public void renderMenu()
     JMenu spawn = new JMenu("spawn");
     JMenuItem ball = new JMenuItem("ball");
     JMenuItem box = new JMenuItem("box");
+    JMenuItem wall = new JMenuItem("wall");
  
+    wall.addActionListener(new ActionListener(){
+  		@Override
+  		public void actionPerformed(ActionEvent e) {
+  			FasT.getFasT().getEntityHandler().spawn(new Wall(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(), 2, new Angle(0.1), FasT.getFasT().getEntityHandler()));
+  		}
+      });
     ball.addActionListener(new ActionListener(){
 		@Override
 		public void actionPerformed(ActionEvent e) {
@@ -506,6 +527,7 @@ public void renderMenu()
     
     spawn.add(ball);
     spawn.add(box);
+    spawn.add(wall);
     
     
     popupMenu.add(game);

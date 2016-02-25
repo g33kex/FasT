@@ -56,6 +56,8 @@ public class Box extends Entity {
 	private Liquid liquid;
 	private C g;
 	
+	private ArrayList<Wall> walls = new ArrayList<Wall>();
+	
 	public Point getMax()
 	{
 		return this.max;
@@ -73,17 +75,18 @@ public class Box extends Entity {
 		this.sides=sides;
 		this.liquid=liquid;
 		this.g=new C(new Angle(3*Math.PI/2),9.81);
+		setWalls();
 		this.initPopupMenu();
 	}
 	
 
 	public Box(Point min, Point max,int sides,Liquid liquid,C g,EntityHandler entityHandler) {
 		super(min, -1, entityHandler);
-		
 		this.max=max;
 		this.sides=sides;
 		this.liquid=liquid;
 		this.g=g;
+		setWalls();
 		this.initPopupMenu();
 	}
 	
@@ -250,6 +253,46 @@ public class Box extends Entity {
 		this.liquid.render(this,render);
 	}
 	
+	public ArrayList<Wall> getWalls()
+	{
+		return this.walls;
+	}
+	
+	public void setWalls()
+	{
+		walls.clear();
+		double minx = this.getPosition().getX();
+		double miny = this.getPosition().getY();
+		double maxx = this.getMax().getX();
+		double maxy = this.getMax().getY();
+		switch(this.sides)
+		{
+		case 4:
+			//Bottom
+			walls.add(new Wall(this.getPosition(),new Point(maxx,miny),entityHandler));
+			//Top
+			walls.add(new Wall(new Point(minx,maxy),this.getMax(),entityHandler));
+			
+			//Left
+			walls.add(new Wall(this.getPosition(),new Point(minx,maxy),entityHandler));
+			//Right
+			walls.add(new Wall(new Point(maxx,miny),this.getMax(),entityHandler));
+			
+			break;
+		case 1:
+			//Bottom
+			walls.add(new Wall(this.getPosition(),new Point(maxx,miny),entityHandler));
+			
+			
+			//Left
+			walls.add(new Wall(this.getPosition(),new Point(minx,maxy),entityHandler));
+			//Right
+			walls.add(new Wall(new Point(maxx,miny),this.getMax(),entityHandler));
+			break;
+		}
+	}
+	
+	
 	
 	public boolean hoover(Point p)
 	{
@@ -307,16 +350,16 @@ public class Box extends Entity {
 			{
 				if(this.max.add(p).toPlan().getY()-this.getPosition().toPlan().getY()>=40)
 				{
-					this.max=this.max.add(p);
+					this.setMax(this.max.add(p));
 				}
 				else
 				{
-					this.max=new Point(this.max.toPlan().getX(),this.getPosition().toPlan().getY()+40).toReal();
+					this.setMax(new Point(this.max.toPlan().getX(),this.getPosition().toPlan().getY()+40).toReal());
 				}
 			}
 			else
 			{
-				this.max=new Point(this.getPosition().toPlan().getX()+40,this.max.toPlan().getY()).toReal();
+				this.setMax(new Point(this.getPosition().toPlan().getX()+40,this.max.toPlan().getY()).toReal());
 			}
 		}
 		return true;
@@ -328,6 +371,25 @@ public class Box extends Entity {
 			return true;
 		return false;
 	}
-	
 
+	@Override
+	public void setPosition(Point position)
+	{
+		super.setPosition(position);
+		this.setWalls();
+		//FasT.getFasT().getLogger().debug("setting pos");
+	}
+	
+	public void setMax(Point max)
+	{
+		//FasT.getFasT().getLogger().debug("setting max");
+		this.max=max;
+		this.setWalls();
+	}
+	
+	public boolean isEntityUnder(Point p)
+	{
+		return BB.distanceBetweenTwoPoints(this.position.toPlan(), p.toPlan())<10 || BB.distanceBetweenTwoPoints(this.max.toPlan(), p.toPlan())<10;
+	}
+	
 }

@@ -21,10 +21,46 @@
 
 package render; 
  
+import static javafx.concurrent.Worker.State.FAILED;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.basic.BasicArrowButton;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
+
+import game.FasT;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -32,19 +68,6 @@ import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicArrowButton;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-
-import static javafx.concurrent.Worker.State.FAILED;
 
 /*
  * Forked from http://docs.oracle.com/javafx/2/swing/swing-fx-interoperability.htm#CHDIEEJE
@@ -56,9 +79,13 @@ public class HelpBrowser extends JPanel {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2680771439845250868L;
+	private static final long serialVersionUID = 5221597464166536291L;
+
+	public boolean fullBrowser = false; 
+	
 	private final JFXPanel jfxPanel = new JFXPanel();
     private WebEngine engine;
+    WebView view; 
  
    // private final JPanel panel = new JPanel(new BorderLayout());
     private final JLabel lblStatus = new JLabel();
@@ -146,6 +173,12 @@ public class HelpBrowser extends JPanel {
         progressBar.setPreferredSize(new Dimension(150, 18));
         progressBar.setStringPainted(true);
   
+        if(!this.fullBrowser)
+        {
+        	btnForward.setVisible(false);
+        	btnBack.setVisible(false);
+        }
+        
         JPanel topBar = new JPanel(new FlowLayout(FlowLayout.LEFT,10,4));
         topBar.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
       //  topBar.add(txtURL, BorderLayout.CENTER);
@@ -216,7 +249,7 @@ public class HelpBrowser extends JPanel {
             @Override 
             public void run() {
  
-                WebView view = new WebView();
+                view = new WebView();
                 engine = view.getEngine();
  
                 engine.titleProperty().addListener(new ChangeListener<String>() {
@@ -303,6 +336,33 @@ public class HelpBrowser extends JPanel {
                             }
                         });
 
+                
+               engine.getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+                    public void changed(ObservableValue ov, State oldState, State newState) {
+                        if (newState == Worker.State.SUCCEEDED) {
+                                // note next classes are from org.w3c.dom domain
+                            EventListener listener = new EventListener() {
+								@Override
+								public void handleEvent(org.w3c.dom.events.Event evt) {
+									String link = "/website/"+((Element)evt.getTarget()).getAttribute("href");
+									FasT.getFasT().getLogger().debug("Trying to open url = "+link);
+									loadURL(link);
+									//FasT.getFasT().getLogger().debug("Click on a link !");
+									//FasT.getFasT().getLogger().debug(((Element)evt.getTarget()).getAttribute("href"));
+								}
+                            };
+
+                           Document doc = engine.getDocument();
+                            //Element el = doc.getElementById("a");
+                            NodeList list = doc.getElementsByTagName("a");
+                            
+                            
+                            for (int i=0; i<list.getLength(); i++)
+                                ((EventTarget)list.item(i)).addEventListener("click", listener, false);
+                        }
+                    }
+                });
+                
                 jfxPanel.setScene(new Scene(view));
             }
         });
@@ -315,10 +375,35 @@ public class HelpBrowser extends JPanel {
                 String tmp = toURL(url);
  
                 if (tmp == null) {
-                    tmp = toURL("http://" + url);
+                    tmp = toURL("file://" + url);
                 }
- 
-                engine.load(tmp);
+                
+        
+               // FasT.getFasT().getLogger().debug("Trying to load url : "+tmp);
+                FasT.getFasT().getLogger().debug("Trying to open url " + url);
+               try {
+            	  /*Path p = Paths.get(this.getClass().getResource(url).toURI());
+            	   
+
+            	// final Map<String, ?> env = Collections.emptyMap();
+                 final FileSystem fs = FileSystems.newFileSystem(p, this.getClass().getClassLoader());
+              //   final Path path = fs.provider().getPath(uri);*/
+            	  
+            	   
+            	   InputStream is = this.getClass().getResourceAsStream(url);
+            	   
+            	   String content = readStream(is);
+
+                 FasT.getFasT().getLogger().debug("Loading url : "+url);
+				engine.loadContent(content);
+				
+               
+               } catch (IOException e) {
+				// TODO Auto-generated catch block
+				
+				FasT.getFasT().getLogger().error("Cannot load url : "+url);
+				//e.printStackTrace();
+			}
             }
         });
     }
@@ -331,5 +416,17 @@ public class HelpBrowser extends JPanel {
         }
     }
 
+    public static String readStream(InputStream stream) throws IOException
+    {
+    	  StringBuilder inputStringBuilder = new StringBuilder();
+          BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+          String line = bufferedReader.readLine();
+          while(line != null){
+              inputStringBuilder.append(line);inputStringBuilder.append('\n');
+              line = bufferedReader.readLine();
+          }
+          return inputStringBuilder.toString();
+    }
+    
   
 }

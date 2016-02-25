@@ -36,4 +36,10 @@ public class Square extends Entity {
 
 	}
 
+	@Override
+	public boolean isEntityUnder(Point p) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

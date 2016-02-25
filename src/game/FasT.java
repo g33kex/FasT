@@ -63,7 +63,16 @@ import render.Render;
 
 
 public class FasT {
-
+///CONFIG
+	
+	
+	//Force du rebond + réaction du support
+	private boolean pos=true;
+	public boolean debug = false;
+	
+	
+	
+	
 	/*Engines (volatile to prevent being corrupted by threads)*/
 	private volatile Logger log = new Logger();
 	private volatile Render render = new Render();
@@ -160,18 +169,29 @@ public class FasT {
 	{
 		render.init(this.width,this.height,this.title);
 	//	this.theBall = entityHandler.spawn(new Ball(new Point(1,3),this.getEntityHandler()));
+		
+		
+		//DEFAULT
 		this.theBall = entityHandler.spawn(new Ball(new Point(-1,0),this.getEntityHandler()));
+		
+		//TWEAK
+		//this.theBall = entityHandler.spawn(new Ball(new Point(0,50),this.getEntityHandler(),0.010));
+		
+		
+		
 		
 		//VELOCITYentityHandler.get(theBall).setVelocity(new C(0.5,0));
 		
 		//BALL2 entityHandler.spawn(new Ball(new Point(1,0),this.getEntityHandler()));
 		
 		//entityHandler.spawn(new Ball(new Point(40,500)));
-	//	entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
+		//entityHandler.spawn(new Wall(new Point(0,20),new Point(this.width,90)));
 		ballInit=entityHandler.get(this.theBall).getPosition();
 		
-		entityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(45),this.getEntityHandler()));
 		
+		
+		//INIT = 
+		entityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(45),this.getEntityHandler()));
 		entityHandler.spawn(new Box(new Point(-4,-3),new Point(4,-1),1,Liquid.WATER(), this.entityHandler));
 		
 		this.spawnWalls();
@@ -264,13 +284,18 @@ public class FasT {
 			// float interpolation = Math.min(1.0f, (float) ((now - lastUpdateTime) / this.period) );
 	         //   double beforeRender = System.nanoTime();
              this.render();
+             
+             if(Display.wasResized())
+            	this.spawnWalls();
 	           lastRenderTime = now;
 			 	//log.info("TIME TO RENDER : "+((System.nanoTime()-beforeRender)/1000000)+"ms");
 	            //Update the frames we got.
 	            int thisSecond = (int) (lastUpdateTime / 1000000000);
 	            if (thisSecond > lastSecondTime)
 	            {
-	             //  log.info("NEW SECOND " + thisSecond + " " + frameCount);
+	               //log.info("NEW SECOND " + thisSecond + " " + frameCount);
+	            	//this.TIME = this.TIME+1;
+	            	
 	               fps = frameCount;
 	               frameCount = 0;
 	               lastSecondTime = thisSecond;
@@ -297,6 +322,8 @@ public class FasT {
 
 	}
 	
+	public double debugtimeinseconds = 0.2;
+	
 	private void handleKeyboard()
 	{
 		while(Keyboard.next())
@@ -314,6 +341,18 @@ public class FasT {
 			if(Keyboard.getEventKey() == Keyboard.KEY_SPACE)
 			{
 				this.setPaused(!this.isPaused());
+				if(!this.pause)
+					TIME = System.nanoTime();
+			}
+			if(Keyboard.getEventKey() == Keyboard.KEY_RIGHT)
+			{
+				this.setPaused(true);
+				this.updateEntities(debugtimeinseconds);
+			}
+			else if(Keyboard.getEventKey() == Keyboard.KEY_LEFT)
+			{
+				this.setPaused(true);
+				this.updateEntities(-debugtimeinseconds);
 			}
 			if(Keyboard.getEventKey() == Keyboard.KEY_T)
 			{
@@ -380,11 +419,7 @@ public class FasT {
 			}
 		}
 	}
-	
-	//Force du rebond + réaction du support
-	private boolean pos=true;
-	public boolean debug = true;
-	
+
 	private void handleMouse() 
 	{
 		boolean c = true;
@@ -530,6 +565,8 @@ public class FasT {
 	
 	
 	//Main method : Update the positions of the entities and handle the mouse / keyboard
+	
+	long TIME = 0;
 	private void update(double deltat) 
 	{
 		this.handleKeyboard();
@@ -544,18 +581,40 @@ public class FasT {
 		if(this.lastUpdateTime==-1) 
 			deltatimeinseconds=0;
 
+		this.updateEntities(deltatimeinseconds);
+		
+		//TODO : TWEAKHERE
+		/*long t = System.nanoTime()-TIME;
+		double time = (t*Math.pow(10, -9));
+		
+		if(time>=2 && time <=2.1)
+		{
+			FasT.getFasT().getLogger().debug("REPONSE QUAND T = 2 ="+this.getEntityHandler().get(this.theBall).getVelocity().getRho());
+		}
+		//FasT.getFasT().getLogger().debug(time);
+		Ball ball = (Ball) this.getEntityHandler().get(this.theBall);
+		if(ball.getPosition().getY()-ball.getRadius()<=0)
+		{
+			this.setPaused(true);
+			FasT.getFasT().getLogger().debug("REPONSE AU SOL (T = "+time+")="+this.getEntityHandler().get(this.theBall).getVelocity().getRho());
+		}*/
+		
+		
+		}
+		this.lastUpdateTime=System.nanoTime();
+		
+	}
+	
+	private void updateEntities(double deltatimeinseconds)
+	{
 		this.getLogger().resetV();
 		for(Entity e : this.entityHandler.getEntities())
 		{
 			e.update(physics,deltatimeinseconds,this.entityHandler.getEntities());
 		}
 		
-		this.getPhysicsHandler().updateCollisions(this.entityHandler.getEntities());
+		//this.getPhysicsHandler().updateCollisions(this.entityHandler.getEntities());
 		
-		}
-		this.lastUpdateTime=System.nanoTime();
-		
-		//TODO : Resize Display when resize glcanvas
 	}
 	
 	

@@ -213,7 +213,7 @@ public abstract class Entity
 		}
 		if(this instanceof Ball && entity1 instanceof Box)
 		{
-			
+			return this.isInside(entity1);
 		}
 
 		//BB.collisionTwoSquares();
@@ -264,4 +264,6 @@ public abstract class Entity
 		this.entityCollided.remove(entity2);
 	}
 
+	public abstract boolean isEntityUnder(Point p);
+	
 }

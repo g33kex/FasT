@@ -107,7 +107,9 @@ public class EntityHandler {
 	public Entity getEntityUnder(Point pos) {
 		for(Entity b : this.getEntities())
 		{
-			if(b instanceof Ball)
+			if(b.isEntityUnder(pos))
+				return b;
+			/*if(b instanceof Ball)
 			{
 			if(BB.distanceBetweenTwoPoints(pos,b.getPosition())<((Ball) b).getRadius())
 			{
@@ -116,11 +118,12 @@ public class EntityHandler {
 			}
 			else if(b instanceof Box)
 			{
-				if(BB.pointInSquare(pos,((Box)b).getPosition(),((Box)b).getMax()) && !(b.getUUID()==FasT.getFasT().theBox))
-						{
+				//if(BB.pointInSquare(pos,((Box)b).getPosition(),((Box)b).getMax()) && !(b.getUUID()==FasT.getFasT().theBox))
+				if(b.shouldMenu(pos))		
+				{
 					return b;
-						}
-			}
+				}
+			}*/
 		}
 		return null;
 	}

@@ -28,4 +28,9 @@ public class Maths {
 		return Math.floor(number*100)/100;
 	}
 	
+	public static double Δ(double A, double B, double C)
+	{
+		return B*B-4*A*C;
+	}
+	
 }
