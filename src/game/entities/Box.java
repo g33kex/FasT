@@ -90,6 +90,10 @@ public class Box extends Entity {
 		this.initPopupMenu();
 	}
 	
+	public Box copy()
+	{
+		return new Box(this.getPosition().copy(),this.getMax().copy(),this.sides,this.getLiquid(),this.g,this.entityHandler);
+	}
 
 	public void updateLabels()
 	{

@@ -115,8 +115,11 @@ public abstract class Entity
 		this.createPopupMenu();
 	}
 	
+	public abstract Entity copy();
+	
 	public void setPosition(Point p)
 	{
+		if(p!=null && p.getX()==p.getX() && p.getY()==p.getY() && p.getX()<Math.pow(10, 10) && p.getY()<Math.pow(10, 10) && p.getX()>-Math.pow(10, 10) && p.getY()>-Math.pow(10, 10))
 		this.position = p;
 	}
 	
@@ -131,6 +134,7 @@ public abstract class Entity
 	}
 	
 	protected double lastUpdateTime=0;
+	public boolean noforces = false;
 	
 	public boolean drag(Point p,long currentNanoTime) {
 		return false;
@@ -159,8 +163,10 @@ public abstract class Entity
 		return 0;
 	}
 
-	public void setVelocity(C velocity) {
-		this.velocity = velocity;
+	public void setVelocity(C v) {
+		if(v==null || v.getRho()<0 || v.getRho()>Math.pow(10, 10) || v!=v)
+			return;
+		this.velocity = v;
 		this.speedLabel.setText("speed(m/s)="+Maths.dfloor(this.getVelocity().getMod()));
 		double ec = Maths.dfloor(this.getMass()/2*Math.pow(this.getVelocity().getMod(),2));
 		this.ecLabel.setText("Ec(J)="+ec);

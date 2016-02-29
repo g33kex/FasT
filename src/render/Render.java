@@ -39,6 +39,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -85,7 +87,7 @@ import physics.maths.Point;
 public class Render {
 /* Render options */
 	protected boolean showArrows = false;
-	public boolean showTails = true;
+	public boolean showTails = false;
 	
 /*-----------------------*/
 	
@@ -97,7 +99,7 @@ public class Render {
 	
 	 private JFrame frame = new JFrame();
 	 public final JPanel panel = new JPanel();
-	 private final Canvas glCanvas = new Canvas();
+	 public final Canvas glCanvas = new Canvas();
 	 private final JPanel panelLeft = new JPanel();
 	 private final JPanel panelOptions = new JPanel();
 	 private final JPanel panelHelp = new JPanel();
@@ -181,7 +183,15 @@ public class Render {
 		//Creating JFRAME
 		frame = new JFrame();
 			
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	//	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter(){
+
+		     @Override
+		    public void windowClosing(WindowEvent e){
+		    	 FasT.getFasT().threadExit();
+		    }
+
+		});
 		frame.setTitle(this.getWindowTitle());
 
 		//Setting dimension and putting it on the center of the screen
@@ -479,7 +489,7 @@ public void renderMenu()
 			FasT.getFasT().getPhysicsHandler().rebonds=rebonds.getState();
 		}
 	});
-    
+    game.add(rebonds);
     
    // JSlider masseVolumiqueSlider = new JSlider();
    // masseVolumiqueSlider.setMinimum(500);
@@ -520,7 +530,7 @@ public void renderMenu()
     box.addActionListener(new ActionListener(){
   		@Override
   		public void actionPerformed(ActionEvent e) {//new C(new Angle(Math.PI),4)
-  			FasT.getFasT().getEntityHandler().spawn(new Box(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),new Point(Mouse.getX()+20,Mouse.getY()+20).mouseToReal(),1,Liquid.WATER(),FasT.getFasT().getEntityHandler()));
+  			FasT.getFasT().getEntityHandler().spawn(new Box(new Point(Mouse.getX(),Mouse.getY()).mouseToReal(),new Point(Mouse.getX()+100,Mouse.getY()+100).mouseToReal(),1,Liquid.WATER(),FasT.getFasT().getEntityHandler()));
   		}
       });
       
@@ -537,7 +547,7 @@ public void renderMenu()
 
 	glCanvas.addMouseListener(new MouseListener() {
 
-		 		public void mouseClicked(MouseEvent e) {}
+		 		public void mouseClicked(MouseEvent e) {checkForTriggerEvent(e);}
 		 		public void mouseEntered(MouseEvent e) {}
 		 		public void mouseExited(MouseEvent e) {}
 		 		
@@ -549,9 +559,12 @@ public void renderMenu()
 
 		      private void checkForTriggerEvent( MouseEvent e )
 		      {
-		         if ( e.isPopupTrigger() )
+	    		 // FasT.getFasT().getLogger().debug("Mouse click inside Canvas");
+		         //if ( e.isPopupTrigger() ) //Well, that works under linux but not with windows... 
+		    	  if(e.getButton()==MouseEvent.BUTTON3 || e.isPopupTrigger() || e.isControlDown())
 		         {
-		        	 Entity entity;
+		    		//  FasT.getFasT().getLogger().debug("Mouse rightclick inside canvas");
+		        	/* Entity entity;
 		        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(e.getX(),glCanvas.getHeight()-e.getY()).mouseToReal()))!=null && entity.shouldMenu(new Point(e.getX(),glCanvas.getHeight()-e.getY()).mouseToReal()))
 		        	 {
 		        		 entity.getPopupMenu().show(e.getComponent(),e.getX(),e.getY());
@@ -559,7 +572,7 @@ public void renderMenu()
 		        	 else
 		        	 {
 		        		   popupMenu.show(e.getComponent(),e.getX(), e.getY());
-		        	 }
+		        	 }*/
 		         }
 		      }
 		     	   
@@ -567,7 +580,7 @@ public void renderMenu()
 
 //SOURCE : http://www.coderanch.com/t/450603/GUI/java/display-click-popup-menu-JPanel
 }
-       
+       	
 
 	public void resetGL()
 	{

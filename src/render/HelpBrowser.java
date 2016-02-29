@@ -345,7 +345,7 @@ public class HelpBrowser extends JPanel {
 								@Override
 								public void handleEvent(org.w3c.dom.events.Event evt) {
 									String link = "/website/"+((Element)evt.getTarget()).getAttribute("href");
-									FasT.getFasT().getLogger().debug("Trying to open url = "+link);
+								//	FasT.getFasT().getLogger().debug("Trying to open url = "+link);
 									loadURL(link);
 									//FasT.getFasT().getLogger().debug("Click on a link !");
 									//FasT.getFasT().getLogger().debug(((Element)evt.getTarget()).getAttribute("href"));
@@ -380,7 +380,7 @@ public class HelpBrowser extends JPanel {
                 
         
                // FasT.getFasT().getLogger().debug("Trying to load url : "+tmp);
-                FasT.getFasT().getLogger().debug("Trying to open url " + url);
+                //FasT.getFasT().getLogger().debug("Trying to open url " + url);
                try {
             	  /*Path p = Paths.get(this.getClass().getResource(url).toURI());
             	   
@@ -394,7 +394,7 @@ public class HelpBrowser extends JPanel {
             	   
             	   String content = readStream(is);
 
-                 FasT.getFasT().getLogger().debug("Loading url : "+url);
+                // FasT.getFasT().getLogger().debug("Loading url : "+url);
 				engine.loadContent(content);
 				
                

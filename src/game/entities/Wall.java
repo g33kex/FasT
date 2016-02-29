@@ -58,6 +58,11 @@ public class Wall extends Entity {
 		//this.longueur =c.getRe();
 	}
 
+	public Wall copy()
+	{
+		return new Wall(this.getPosition().copy(),this.getMaxPos().copy(),this.entityHandler);
+	}
+	
 	@Override
 	public void render(Render render) {
 		GL11.glColor3d(0.5, 0.1, 0.8);
@@ -90,6 +95,15 @@ public class Wall extends Entity {
 	}
 
 
+	protected void initPopupMenu()
+	{
+		popupMenu.remove(speedLabel);
+		popupMenu.remove(ecLabel);
+		
+		this.popupMenu.pack();
+		
+	}
+	
 
 	public boolean shouldMenu(Point p)
 	{

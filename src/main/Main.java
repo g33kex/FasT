@@ -79,27 +79,37 @@ public class Main
 		fasT.run();
 	}
 	
-	/*public static void testAngles()
+	public static void testAngles()
 	{
 		Physics physics = new Physics();
-		EntityHandler handler = new EntityHandler();
-		Ball entity1 = new Ball(new Point(0,0),handler);
-		entity1.setVelocity(new C(new Angle(0),1));
-		
-		
-		C t = new C(new Angle(0),1);
-		
-		final double pi = Math.PI;
-		
-		double[] O = new double[] {pi/4,3*pi/4,5*pi/4,7*pi/4};
-		
-		for(double Θ1 : O)
-		{
-		
-			for(double Θ2 : O)
+		FasT fasT;
+		try {
+			fasT = new FasT();
+			fasT.getLogger().shallLog=true;
+			EntityHandler handler = new EntityHandler();
+			Ball entity1 = new Ball(new Point(0,0),handler);
+			entity1.setVelocity(new C(new Angle(0),1));
+			
+			
+			C t = new C(new Angle(0),1);
+			C n = new C(new Angle(Math.PI),1);
+			
+			final double pi = Math.PI;
+			
+			double[] O = new double[] {0,pi/2,pi/3,pi/4,2*pi/3};
+			
+			for(double Θ1 : O)
 			{
-				physics.setNewVelocity(Θ1, Θ2, entity1, entity1, t);
+			
+				for(double Θ2 : O)
+				{
+					physics.setNewVelocity(Θ1, Θ2, entity1, entity1, t,n);
+				}
 			}
+		} catch (LWJGLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-	}*/
+		
+	}
 }

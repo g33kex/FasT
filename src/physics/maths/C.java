@@ -52,6 +52,11 @@ public class C {
 		this.im=0;
 	}
 
+	public C copy()
+	{
+		return new C(this.getRe(),this.getIm());
+	}
+	
 	//Getters
 	public double getIm()
 	{

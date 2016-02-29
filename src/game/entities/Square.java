@@ -42,4 +42,8 @@ public class Square extends Entity {
 		return false;
 	}
 
+	public Entity copy()
+	{
+		return null;
+	}
 }

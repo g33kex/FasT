@@ -71,6 +71,7 @@ public class FasT {
 	public boolean debug = false;
 	
 	
+	private volatile boolean shouldExit = false;
 	
 	
 	/*Engines (volatile to prevent being corrupted by threads)*/
@@ -157,10 +158,13 @@ public class FasT {
 		//this.pause=false;
 		FasT.theFasT = this;
 		//Vector v = new Vector(-1,0,true);
-		C c = new C(-1,1);
-		log.info("STARTING");
-		log.debug(c.toString());
-		log.debug(c.toStringAng(true));
+		//C c = new C(-1,1);
+		log.horodate("We'llcome too FasT !");
+		log.info("[Starting]");
+		
+		
+		//log.debug(c.toString());
+		//log.debug(c.toStringAng(true));
 		//this.getLogger().debug(v.complex.ToPolar().toString());
 		//throw new LWJGLException();
 	}
@@ -172,7 +176,7 @@ public class FasT {
 		
 		
 		//DEFAULT
-		this.theBall = entityHandler.spawn(new Ball(new Point(-1,0),this.getEntityHandler()));
+		this.theBall = entityHandler.spawn(new Ball(new Point(0,1),this.getEntityHandler()));
 		
 		//TWEAK
 		//this.theBall = entityHandler.spawn(new Ball(new Point(0,50),this.getEntityHandler(),0.010));
@@ -191,7 +195,7 @@ public class FasT {
 		
 		
 		//INIT = 
-		entityHandler.spawn(new Wall(new Point(-2,-2),4,new Angle(45),this.getEntityHandler()));
+		entityHandler.spawn(new Wall(new Point(-2,-0.5),4,new Angle(0),this.getEntityHandler()));
 		entityHandler.spawn(new Box(new Point(-4,-3),new Point(4,-1),1,Liquid.WATER(), this.entityHandler));
 		
 		this.spawnWalls();
@@ -199,7 +203,6 @@ public class FasT {
 		
 		render.updateLabels();
 	}
-	
 	private void spawnWalls()
 	{
 		Box l = (Box) FasT.getFasT().getEntityHandler().get(FasT.getFasT().theBox);
@@ -354,6 +357,20 @@ public class FasT {
 				this.setPaused(true);
 				this.updateEntities(-debugtimeinseconds);
 			}
+			if(Keyboard.getEventKey() == 13)
+			{
+				Normal.unzoom(24);
+				this.spawnWalls();
+			}
+			if(Keyboard.getEventKey() == 53)
+			{
+				Normal.zoom(24);
+				this.spawnWalls();
+			}
+			
+			if(!this.log.shallLog)
+				return;
+			
 			if(Keyboard.getEventKey() == Keyboard.KEY_T)
 			{
 				entityHandler.spawn(new Ball(new Point(10,500).toPlan(),this.getEntityHandler()));
@@ -394,16 +411,7 @@ public class FasT {
 			{
 				this.entityHandler.destroy(this.entityHandler.getEntityUnder(new Point(Mouse.getEventX(),Mouse.getEventY())));
 			}
-			if(Keyboard.getEventKey() == 13)
-			{
-				Normal.unzoom(24);
-				this.spawnWalls();
-			}
-			if(Keyboard.getEventKey() == 53)
-			{
-				Normal.zoom(24);
-				this.spawnWalls();
-			}
+		
 			if(Keyboard.getEventKey() == Keyboard.KEY_Z)
 			{
 		        GL11.glOrtho(0, 5,0,5, -1.0, 1.0);
@@ -477,6 +485,33 @@ public class FasT {
 				}
 			}
 			
+			if(Mouse.getEventButtonState() && Mouse.getEventButton()==1)
+			{
+				Point p = new Point(Mouse.getEventX(),this.getRender().glCanvas.getHeight()-Mouse.getEventY());
+				Point pr = new Point(Mouse.getEventX(),Mouse.getEventY());
+				 Entity entity;
+	        	 if((entity=FasT.getFasT().getEntityHandler().getEntityUnder(new Point(pr.getX(),pr.getY()).mouseToReal()))!=null && entity.shouldMenu(new Point(pr.getX(),pr.getY()).mouseToReal()))
+	        	 {
+	        		 entity.getPopupMenu().show();
+	        		 entity.getPopupMenu().show(this.getRender().glCanvas,(int)p.getX(),(int)p.getY());
+	        	 }
+	        	 else
+	        	 {
+	        		   render.popupMenu.show();
+	        		   render.popupMenu.show(this.getRender().glCanvas,(int)p.getX(),(int)p.getY());
+	        	 }
+	        	 continue;
+			}
+			else if(Mouse.getEventButtonState())
+			{
+				render.popupMenu.hide();
+				for(Entity entity : FasT.getFasT().getEntityHandler().getEntities())
+				{
+					entity.getPopupMenu().hide();
+				}
+			}
+		
+			
 			if(Mouse.isButtonDown(0) && Keyboard.isKeyDown(Keyboard.KEY_RSHIFT) && !Keyboard.isKeyDown(Keyboard.KEY_RMENU))
 			{
 				Normal.x+=Mouse.getEventDX();
@@ -491,7 +526,10 @@ public class FasT {
 			if(!Mouse.isButtonDown(0) || Keyboard.isKeyDown(Keyboard.KEY_RMENU))
 			{
 				for(Entity entity : this.entityHandler.getEntities()) {
+					if(Mouse.getEventDX()==Mouse.getEventDX() && Mouse.getEventDY()==Mouse.getEventDY())
+					{
 					entity.setBeingDragged(false, new Point(Mouse.getEventDX(),Mouse.getEventDY()).mouseToReal());
+					}
 				}
 			}
 			
@@ -516,6 +554,7 @@ public class FasT {
 						}
 						else
 						{
+							if(Mouse.getEventDX()==Mouse.getEventDX() && Mouse.getEventDY()==Mouse.getEventDY())
 							e.setBeingDragged(true, new Point(Mouse.getEventX(),Mouse.getEventY()).mouseToReal());
 						}
 				}
@@ -569,6 +608,8 @@ public class FasT {
 	long TIME = 0;
 	private void update(double deltat) 
 	{
+		if(this.shouldExit)
+			exit();
 		this.handleKeyboard();
 		this.handleMouse();
 		
@@ -613,7 +654,7 @@ public class FasT {
 			e.update(physics,deltatimeinseconds,this.entityHandler.getEntities());
 		}
 		
-		//this.getPhysicsHandler().updateCollisions(this.entityHandler.getEntities());
+		this.getPhysicsHandler().updateCollisions(this.entityHandler.getEntities());
 		
 	}
 	
@@ -667,6 +708,10 @@ public class FasT {
 
 	public void quit() {
 		this.on=false;		
+	}
+
+	public void threadExit() {
+		this.shouldExit=true;
 	}
 
 	

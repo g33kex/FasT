@@ -55,6 +55,7 @@ public class Angle {
 	
 	public double getDeg() {
 		return this.getDeg(this.value);
+
 	}
 	
 	private double getDeg(double rad)
@@ -78,5 +79,11 @@ public class Angle {
 		C c = new C(new Angle(rad),1);
 		return Math.atan2(c.getIm(), c.getRe());
 	}
+
+	
+	
+	/*public static Angle getAngle(C t, C v) {
+		
+	}*/
 
 }

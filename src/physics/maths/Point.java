@@ -77,5 +77,9 @@ public class Point {
 	{
 		return new C(this.getX(),this.getY());
 	}
+
+	public Point copy() {
+		return new Point(this.getX(),this.getY());
+	}
 	
 }

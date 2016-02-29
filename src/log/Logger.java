@@ -21,7 +21,9 @@
 
 package log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import game.Color;
 import game.FasT;
@@ -33,7 +35,7 @@ public class Logger {
 	
 	private int level=0;
 	
-	public boolean shallLog = true;
+	public boolean shallLog = false;
 	
 	//Log levels : 0 = all; 1 = info, warning, error; 2 = warning, error; 3 = error
 	public Logger(int level)
@@ -51,6 +53,10 @@ public class Logger {
 		this.log("[DEBUG]: " + this.convertToString(s), 1);
 	}
 	
+	public void horodate(String string) {
+		this.log("["+this.horodate()+"]: "+ this.convertToString(string),2);
+	}
+
 	public void info(Object s)
 	{
 		this.log("[Info]: " + this.convertToString(s), 2);
@@ -69,6 +75,13 @@ public class Logger {
 	private String convertToString(Object s)
 	{
 		return s.toString();
+	}
+	
+	
+	private String horodate() {
+		 Calendar cal = Calendar.getInstance();
+	     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+	     return sdf.format(cal.getTime());
 	}
 	
 	private void log(String s,int level)
@@ -147,6 +160,7 @@ public class Logger {
 	{
 		this.logV.clear();
 	}
+
 	
 }
 

@@ -239,6 +239,14 @@ class B extends A {
 		this.initPopupMenu();
 	}
 	
+	@Override
+	public Ball copy()
+	{
+		Ball ball = new Ball(this.getPosition().copy(),this.getRadius(),this.entityHandler);
+		ball.setVelocity(this.getVelocity());
+		return ball;
+	}
+	
 	public Ball(Point position,double radius,EntityHandler entityHandler)
 	{
 		super(position,0.0312,entityHandler);
