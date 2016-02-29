@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 5.0.3.2 (MacOSX)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="2016-02-29T03:28:36.540462000"/>
+	<meta name="created" content="2016-02-29T01:07:42.996160000">
+	<meta name="changed" content="2016-02-29T03:05:14.565402000">
+</head>
+<body lang="fr-FR" dir="ltr">
+<p><u>Conclusion</u></p>
+<p>FasT est maintenant un logiciel prêt à être utilisé. On peut
+simuler des chutes libres, car la trajectoire d'un objet en chute
+libre peut être calculée facilement puisque l'accélération est
+constante. Cependant, de telles chutes ne correspondent pas à la
+réalité&nbsp;: même dans le vide, la force de gravitation varie
+avec la distance de l'objet au corps céleste qui l'attire. Pour ce
+qui est des chutes avec frottements, nous avons eu recours à des
+approximations en utilisant la méthode d'Euler, car les intégrales
+sont difficiles à calculer pour des forces quadratique. Pour le cas
+des collisions, on se rend compte que les méthodes de calcul sont
+complexes et doivent gérer un grand nombre d'objets en même temps.
+Se pose alors le cas de collisions multiples au même moment. Les
+approximations dues à la cadence du processeur de l'ordinateur
+utilisé pour les simulation sont aussi à prendre en compte lors de
+l'écriture d'un tel algorithme, il faut faire attention à ce que
+les objets ne traversent pas les obstacles. <br/>
+On peut voir
+plusieurs utilisations possibles à notre logiciel. D'abord,
+enseigner les chutes et illustrer par l'exemple, c'est le cas lorsque
+l'algorithme se met en pause après chaque collision ce qui permet
+d'étudier tous les vecteurs mis en jeu. Ensuite, ce logiciel est
+prévu pour résoudre des problèmes. Il suffit de modifier un peu le
+code source pour qu'il puisse calculer les conditions finales d'une
+expérience de chute à partir de conditions initiales. Enfin,
+l'algorithme de physique étant portable, il peut être intégré
+dans tout autre programme, comme par exemple dans un jeu vidéo, afin
+que les personnages à l'intérieur de ce dernier soient soumis aux
+chutes, aux rebonds et aux forces de frottements. <br/>
+FasT peut
+aller plus loin que la simulation de simple chutes. Nous avons tenté
+de le montrer avec son mode Univers, qui simule les interactions
+entre des planètes. En ajoutant un module pour simuler les
+interactions électromagnétiques entre deux corps, qui s'intègrerait
+directement dans le programme, on pourrait simuler des structures
+moléculaires, comme de simples molécules de dioxyde de carbone, qui
+évolueraient dans l'espace et pourraient interagir entre elles,
+selon les mêmes lois de la physique que dans la réalité. On
+pourrait même, avec ce genre de logiciel, simuler des corps
+complexes tels que des protéines. Ce type de logiciels ouvre la
+porte à de nouvelles découvertes scientifiques, aussi bien dans les
+domaines mathématiques, physiques que biologiques.</p>
+</body>
+</html>
